@@ -1,88 +1,0 @@
-8
-
-dir
-54
-https://svn.akkit.org/svn/maxmod/trunk/maxmod
-https://svn.akkit.org/svn/maxmod
-
-
-
-2008-11-19T15:51:26.333716Z
-53
-eKid
-
-
-svn:special svn:externals svn:needs-lock
-
-
-
-
-
-
-
-
-
-
-
-71dc7687-5248-0410-adef-9c389f1766a8
-
-source_ds9
-dir
-
-source
-dir
-
-include
-dir
-
-asm_include
-dir
-
-source_ds9e
-dir
-
-source_ds
-dir
-
-source_gba
-dir
-
-maxmod.mak
-file
-
-
-
-
-2008-11-20T02:47:18.000000Z
-2d6adc474c408ce55e65d842bcfd9553
-2008-07-26T00:54:32.692527Z
-7
-eKid
-
-maxmod.pnproj
-file
-
-
-
-
-2008-11-20T02:47:18.000000Z
-1ef39656fd572e9aa22dbcb801f74e5a
-2008-11-11T04:18:16.462256Z
-50
-eKid
-
-source_ds7
-dir
-
-Makefile
-file
-
-
-
-
-2008-11-20T02:47:18.000000Z
-248310838cfe8137a39f3327f235aee0
-2008-05-22T10:35:21.342129Z
-4
-WinterMute
-
