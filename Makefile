@@ -10,20 +10,22 @@ install: install-gba install-nds install-ndse
 install-gba: gba
 	cp lib/libmm.a $(DEVKITPRO)/libgba/lib
 	cp include/maxmod.h include/mm_types.h $(DEVKITPRO)/libgba/include
+	cp maxmod_license.txt $(DEVKITPRO)/libgba
 
 install-nds: ds7 ds9
 	cp lib/libmm7.a lib/libmm9.a $(DEVKITPRO)/libnds/lib
 	cp include/maxmod7.h include/maxmod9.h include/mm_types.h $(DEVKITPRO)/libnds/include
+	cp maxmod_license.txt $(DEVKITPRO)/libnds
 
 install-ndse: ds9e
 
 dist: dist-gba dist-nds dist-nds9e
 
 dist-gba:	gba
-	tar -cjf maxmod-gba.tar.bz2 include/maxmod.h include/mm_types.h lib/libmm.a
+	tar -cjf maxmod-gba.tar.bz2 include/maxmod.h include/mm_types.h lib/libmm.a maxmod_license.txt
 
 dist-nds:	ds7 ds9
-	tar -cjf maxmod-nds.tar.bz2 include/maxmod7.h include/maxmod9.h include/mm_types.h lib/libmm7.a lib/libmm9.a
+	tar -cjf maxmod-nds.tar.bz2 include/maxmod7.h include/maxmod9.h include/mm_types.h lib/libmm7.a lib/libmm9.a maxmod_license.txt
 
 dist-nds9e: ds9e
 
