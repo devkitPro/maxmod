@@ -168,7 +168,6 @@ mmSetupComms:
  * Value32 handler
  *******************************************************************/
 mmReceiveValue32:
-	
 	ldr	r1,=mmFifo
 	ldr	r2,=mmFifoPosition
 	ldr	r2, [r2, #4]

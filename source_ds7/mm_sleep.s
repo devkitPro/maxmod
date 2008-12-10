@@ -21,6 +21,9 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF  *
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           *
  ****************************************************************************/
+ 
+// sleep functions are not needed!
+#if 0
 
 /* ARM7 Only Functions */
 
@@ -130,3 +133,5 @@ mmExitSleep:
 	bx	r3
 
 .pool
+
+#endif

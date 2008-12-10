@@ -1486,6 +1486,7 @@ mppProcessTick_incframe:
 	ldrb	r1, [r5, #MPL_PATTJUMP]
 	cmp	r1, #255
 	beq	.mppt_no_pj
+	
 	mov	r2, #255
 	strb	r2, [r5, #MPL_PATTJUMP]
 	mov	r0, r1
@@ -3333,9 +3334,8 @@ mppe_PositionJump:			@ EFFECT Bxy: SET POSITION
 @---------------------------------------------------------------------------------
 mppe_PatternBreak:				@ EFFECT Cxy: PATTERN BREAK
 @---------------------------------------------------------------------------------
-
 	bne	.mppe_pb_exit			@ skip nonzero ticks
-	mov	r0, r8			@ get variables
+	mov	r0, r8				@ get variables
 	strb	r1, [r0, #MPL_PATTJUMP_ROW]	@ save param to row value
 	ldrb	r1, [r0, #MPL_PATTJUMP]		@ check if pattjump=empty
 	cmp	r1, #255			@ 255=empty
@@ -4613,6 +4613,7 @@ mpph_FastForward:
 .mpph_ff_exitf:
 	bx	lr
 .mpph_ff:
+	
 	mov	r0, r8
 	ldrb	r2, [r0, #MPL_NROWS]
 	add	r2, #1
@@ -4622,12 +4623,13 @@ mpph_FastForward:
 	push	{r7,lr}
 	ldr	r7,=mmReadPattern //mpp_ReadPattern
 .mpph_ff_loop:
-	push	{r1}
+	push	{r1,r7}
 	bl	mpp_call_r7
-	pop	{r1}
+	pop	{r1,r7}
 	sub	r1, #1
 	bne	.mpph_ff_loop
 
+	pop	{r7}
 	pop	{r0}
 	bx	r0
 //	pop	{pc}

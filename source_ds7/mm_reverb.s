@@ -221,7 +221,10 @@ mmReverbConfigure:
 	ldrb	r0, [r4, #mmrc_panning]		//     inverse panning for other channel
 	mov	r1, #128			//
 	sub	r1, r0				//
-	strb	r1, [r4, #mmrc_panning]		//
+	cmp	r1, #128			//     clip 128=127
+	bne	3f				//
+	mov	r1, #127			//
+3:	strb	r1, [r4, #mmrc_panning]		//
 2:
 	ldr	r1,=SNDCAP0CNT			
 	

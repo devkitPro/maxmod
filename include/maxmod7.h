@@ -101,24 +101,6 @@ void mmSelectMode( mm_mode_enum mode );
 
 void mmFrame( void );
 
-/*****************************************************************
- * mmEnterSleep()
- *
- * Enter low power sleep mode
- * Note: does not disable sound amplifier
- *****************************************************************/
-
-void mmEnterSleep();
-
-/*****************************************************************
- * mmExitSleep()
- *
- * Exit low power sleep mode
- * Note: does not enable sound amplifier
- *****************************************************************/
-
-void mmExitSleep();
-
 // note about using sleep functions:
 // do not use during an interrupt!! it's not safe
 // and do not exit sleep unless it is already sleeping.
