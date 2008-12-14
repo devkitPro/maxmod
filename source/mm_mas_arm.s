@@ -542,11 +542,12 @@ mmChannelStartACHN:		// returns r2=note
 full_notemap:
 	
 	add	r0, r2, lsl#1			// add note offset
-	ldrh	r0, [r0, r1]			// read notemap entry [instr+note*2+notemap_offset]
-	strb	r0, [r7, #MCH_NOTE]		// write note value
+	ldrh	r2, [r0, r1]			// read notemap entry [instr+note*2+notemap_offset]
+	strb	r2, [r7, #MCH_NOTE]		// write note value
 	cmp	r6, #0				// if channel is valid
-	mov	r0, r0, lsr#8			//   write sample value
+	mov	r0, r2, lsr#8			//   write sample value
 	strneb	r0, [r6, #MCA_SAMPLE]		//   ..
+	and	r2, #255
 invalid_instrument:
 	bx	lr				// return
 	
