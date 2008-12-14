@@ -37,7 +37,7 @@ dist-nds9e: ds9e
 	
 dist-src:
 	@tar	--exclude=*CVS* -cvjf maxmod-src-$(VERSTRING).tar.bz2 \
-	include source* Makefile maxmod.mak maxmod_license.txt
+	asm_include include source* Makefile maxmod.mak maxmod_license.txt
 
 gba:
 	$(MAKE) -f maxmod.mak SYSTEM=GBA
