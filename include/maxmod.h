@@ -45,6 +45,14 @@ extern "C" {
 #define MM_SIZEOF_MIXCH		24
 
 /****************************************************************************
+ * mmInitDefault( mm_addr soundbank, mm_word number_of_channels )
+ *
+ * Initialize Maxmod with default settings.
+ ****************************************************************************/
+ 
+void mmInitDefault( mm_addr soundbank, mm_word number_of_channels );
+
+/****************************************************************************
  * mmInit( mm_gba_system* setup )
  *
  * Initialize system. Call once at startup.

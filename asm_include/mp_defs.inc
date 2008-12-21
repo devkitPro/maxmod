@@ -31,15 +31,17 @@
 @ other definitions
 #ifdef SYS_GBA
 
-.equ		MM_GBA_SYSTEM_MODE,		0
-.equ		MM_GBA_SYSTEM_MCH_COUNT,4
-.equ		MM_GBA_SYSTEM_ACH_COUNT,8
-.equ		MM_GBA_SYSTEM_MODCH,	12
-.equ		MM_GBA_SYSTEM_ACTCH,	16
-.equ		MM_GBA_SYSTEM_MIXCH,	20
-.equ		MM_GBA_SYSTEM_MIXMEM,	24
-.equ		MM_GBA_SYSTEM_WAVEMEM,	28
-.equ		MM_GBA_SYSTEM_SOUNDBANK,32
+.struct 0
+MM_GBA_SYSTEM_MODE:		.space 4
+MM_GBA_SYSTEM_MCH_COUNT:	.space 4
+MM_GBA_SYSTEM_ACH_COUNT:	.space 4
+MM_GBA_SYSTEM_MODCH:		.space 4
+MM_GBA_SYSTEM_ACTCH:		.space 4
+MM_GBA_SYSTEM_MIXCH:		.space 4
+MM_GBA_SYSTEM_MIXMEM:		.space 4
+MM_GBA_SYSTEM_WAVEMEM:		.space 4
+MM_GBA_SYSTEM_SOUNDBANK:	.space 4
+MM_GBA_SYSTEM_SIZE:
 
 .equ		SAMPFRAC,		12	@ # of bits used in fractional part of sample reading
 #endif
