@@ -32,12 +32,14 @@ extern "C" {
 #endif
 
 // precalculated mix buffer lengths (in bytes)
-#define MM_MIXLEN_8KHZ		544
-#define MM_MIXLEN_10KHZ		704
-#define MM_MIXLEN_13KHZ		896
-#define MM_MIXLEN_16KHZ		1056
-#define MM_MIXLEN_18KHZ 	1216
-#define MM_MIXLEN_21KHZ 	1408
+#define MM_MIXLEN_8KHZ		544		// (8121 hz)
+#define MM_MIXLEN_10KHZ		704		// (10512 hz)	
+#define MM_MIXLEN_13KHZ		896		// (13379 hz)	
+#define MM_MIXLEN_16KHZ		1056	// (15768 hz)
+#define MM_MIXLEN_18KHZ 	1216	// (18157 hz)
+#define MM_MIXLEN_21KHZ 	1408	// (21024 hz)
+#define MM_MIXLEN_27KHZ		1792	// (26758 hz)
+#define MM_MIXLEN_31KHZ		2112	// (31536 hz)
 
 // measurements of channel types (bytes)
 #define MM_SIZEOF_MODCH		40

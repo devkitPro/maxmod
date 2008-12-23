@@ -125,7 +125,7 @@ mm_mixch_end:	.space 4	@ dont move
 mm_ratescale:	.space 4	@ dont move
 mm_timerfreq:	.space 4	@ dont move
 
-mm_bpmdv:	.space 2
+mm_bpmdv:	.space 4
 
 mp_mix_seg:	.space 1	@ mixing segment select
 
@@ -1228,7 +1228,8 @@ mmMixerInit:
 	ldrh	r3, [r3, r1]
 	str	r3, [r2, #28]
 	adr	r3, mp_bpm_divisors
-	ldrh	r3, [r3,r1]
+	lsl	r1, #1
+	ldr	r3, [r3,r1]
 
 	ldr	r2,=mm_bpmdv
 	str	r3, [r2,#0]
@@ -1325,32 +1326,32 @@ mmMixerInit:
 	bx	lr					@ finished
 	
 
+// round(rate / 59.737)
 .align
 mp_mixing_lengths:
-	.hword	136,  176,  224,  264,  304,  352
-	@      8khz,10khz,13khz,16khz,18khz,21khz
+	.hword	136,  176,  224,  264,  304,  352,  448,  528
+	@      8khz,10khz,13khz,16khz,18khz,21khz,27khz,32khz
 
 .align
 //mp_freq_scales:		@ (16khz -> real)
 //	.hword 33056, 25536, 20064, 17024, 14784, 12768
+
+// 15768*16384 / rate
 mp_rate_scales:
-	.hword 32768, 24576, 19309, 16384, 14228, 12288
-	@       8khz, 10khz, 13khz, 16khz, 18khz, 21khz
-	@       7884, 10512, 13379, 15768, 18157, 21024
+	.hword 31812, 24576, 19310, 16384, 14228, 12288,  9655,  8192
+	@       8khz, 10khz, 13khz, 16khz, 18khz, 21khz, 27khz, 32khz
+	@       8121, 10512, 13379, 15768, 18157, 21024, 26758, 31536,
 
 .align
+// gbaclock / rate
 mp_timing_sheet:
-	.hword -2066,-1596,-1254,-1064, -924, -798
-	@       8khz,10khz,13khz,16khz,18khz,21khz
+	.hword -2066,-1596,-1254,-1064, -924, -798, -627, -532
+	@       8khz,10khz,13khz,16khz,18khz,21khz,27khz,32khz
 
 .align
+// rate * 2.5
 mp_bpm_divisors:
-	.hword 20302
-	.hword 26280
-	.hword 33447
-	.hword 39420
-	.hword 45393
-	.hword 52560
+	.word 20302,26280,33447,39420,45393,52560,66895,78840
 
 	
 .end

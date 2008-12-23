@@ -964,7 +964,7 @@ mpp_setbpm:
 	lsr	r1, #10			//
 	
 	ldr	r0,=mm_bpmdv		@ samples per tick ~= mixfreq / (bpm/2.5) ~= mixfreq*2.5/bpm
-	ldrh	r0,[r0]
+	ldr	r0,[r0]
 	
 	swi	SWI_DIVIDE		@ SWI 07h, divide r1/r0
 	lsr	r0, #1			@ multiple of two
