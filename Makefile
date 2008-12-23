@@ -1,6 +1,6 @@
 export MAXMOD_MAJOR	:= 1
 export MAXMOD_MINOR	:= 0
-export MAXMOD_PATCH	:= 1
+export MAXMOD_PATCH	:= 2
 
 VERSTRING	:=	$(MAXMOD_MAJOR).$(MAXMOD_MINOR).$(MAXMOD_PATCH)
 
@@ -28,15 +28,15 @@ install-ndse: ds9e
 dist: dist-gba dist-nds dist-nds9e dist-src
 
 dist-gba:	gba
-	@tar -cjvf maxmod-gba-$(VERSTRING).tar.bz2 include/maxmod.h include/mm_types.h lib/libmm.a maxmod_license.txt
+	@tar --exclude=.svn -cjvf  maxmod-gba-$(VERSTRING).tar.bz2 include/maxmod.h include/mm_types.h lib/libmm.a maxmod_license.txt
 
 dist-nds:	ds7 ds9
-	@tar -cjvf maxmod-nds-$(VERSTRING).tar.bz2 include/maxmod7.h include/maxmod9.h include/mm_types.h lib/libmm7.a lib/libmm9.a maxmod_license.txt
+	@tar --exclude=.svn -cjvf maxmod-nds-$(VERSTRING).tar.bz2 include/maxmod7.h include/maxmod9.h include/mm_types.h lib/libmm7.a lib/libmm9.a maxmod_license.txt
 
 dist-nds9e: ds9e
 	
 dist-src:
-	@tar	--exclude=*CVS* -cvjf maxmod-src-$(VERSTRING).tar.bz2 \
+	@tar --exclude=.svn -cvjf maxmod-src-$(VERSTRING).tar.bz2 \
 	asm_include include source* Makefile maxmod.mak maxmod_license.txt
 
 gba:
