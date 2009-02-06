@@ -878,7 +878,7 @@ mmStreamEnd:
 	ldr	r1,=SOUND4CNT
 	mov	r2, #0
 	ldr	r0,=mmsData
-	ldrb	r0, [r4, #v_format]
+	ldrb	r0, [r0, #v_format]
 	lsr	r0, #1
 	bcc	1f
 
