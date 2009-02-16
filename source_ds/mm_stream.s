@@ -41,19 +41,22 @@
 	.equ	TIMER_MANUAL,	0b10000011	// start, /1024
 	
 	.struct 0
-v_hwtimer:		.space 4
-v_wave:			.space 4
-v_workmem:		.space 4
-v_function:		.space 4
-v_remainder:		.space 2
+v_active:		.space 1
+v_format:		.space 1
+v_auto:			.space 1
+v_reserved:		.space 1
 v_clks:			.space 2
 v_tmr:			.space 2
 v_len:			.space 2
 v_lenw:			.space 2
 v_pos:			.space 2
-v_active:		.space 1
-v_format:		.space 1
-v_auto:			.space 1
+v_reserved2:		.space 2
+v_hwtimer:		.space 4
+v_wave:			.space 4
+v_workmem:		.space 4
+v_function:		.space 4
+v_remainder:		.space 4
+
 v_size:
 
 /***********************************************************************
@@ -199,7 +202,7 @@ mmStreamOpen:
 	str	r0, [r6, #v_function]		//
 	
 	mov	r0, #0				// clear remainder
-	strh	r0, [r6, #v_remainder]		//
+	str	r0, [r6, #v_remainder]		//
 	
 //	ldrh	r0, [r6, #v_len]
 //	sub	r0, #DELAY_SAMPLES
@@ -239,8 +242,8 @@ mmStreamOpen:
 	sub	r1, #1				//
 	mov	r2, #1				//
 	strb	r2, [r0, r1]			//
-	push	{r1}				//
-	ldr	r1,=DrainWriteBuffer
+	push	{r1}				//	
+	ldr	r1,=DrainWriteBuffer		// <-okay?
 	blx	r1
 	#endif
 	
@@ -328,7 +331,7 @@ mmStreamUpdate:
 .mmsu_manual:					//
 	
 	lsl	r0, #10				// samples = (t * 1024 + r) / clks
-	ldrh	r1, [r4, #v_remainder]		//
+	ldr	r1, [r4, #v_remainder]		//
 	add	r0, r1				//
 	ldrh	r1, [r4, #v_clks]		//
 						//
@@ -341,7 +344,7 @@ mmStreamUpdate:
 	mul	r2, r3				//
 	add	r1, r2				//
 	
-	strh	r1, [r4, #v_remainder]		// save remainder
+	str	r1, [r4, #v_remainder]		// save remainder
 
 STREAM_FORCE_REQUEST:
 	
@@ -351,11 +354,12 @@ STREAM_FORCE_REQUEST:
 //------------------------------------------------
 // request data
 //------------------------------------------------
-
+	
 	mov	r5, r0
 	
 .fill_stream:
 	mov	r0, r5				// r0 = #samples
+	beq	.fill_complete
 	ldrh	r1, [r4, #v_len]		// cut r0 to work buffer size
 	cmp	r0, r1				//
 	ble	1f				//
@@ -373,13 +377,28 @@ STREAM_FORCE_REQUEST:
 	#else
 	blx	r3
 	#endif
-	pop	{r0}
+	push	{r0}
 	
-	ldr	r1,=CopyDataToStream
-	bl	_call_via_r1
+	ldr	r1,=CopyDataToStream		// copy samples to stream ...
+	bl	_call_via_r1			//
+	pop	{r0, r1}			// r0 = samples filled, r1 = desired amount
 	
-	cmp	r5, #0				// loop if samples remain (bad)
-	bne	.fill_stream			//
+	sub	r1, r0				// r1 = unsatisfied samples
+	add	r5, r1
+	cmp	r0, #0
+	beq	_no_samples_output		// break if 0 samples output
+	
+	cmp	r5, r0				// total += leftover
+	bge	.fill_stream			// loop if remaining >= amount filled
+	
+_no_samples_output:
+	ldrh	r2, [r4, #v_clks]		// add leftover to remaining cycles
+	mul	r2, r5				// (samples * clks)
+	ldr	r3, [r4, #v_remainder]		//
+	add	r3, r2				//
+	str	r3, [r4, #v_remainder]		//
+	
+.fill_complete:
 	
 	#ifdef SYS_NDS9
 	
@@ -451,6 +470,8 @@ WaitUntilZero:
  * Copy/de-interleave data from work buffer into the wave buffer.
  ***********************************************************************/
 CopyDataToStream:
+	cmp	r0, #0
+	bxeq	lr
 	
 	push	{r4-r9,r10, r11, lr}
 	
@@ -502,14 +523,16 @@ CopyDataToStream:
 	cmp	r7, #3			//
 	blt	.cd_mono16		//
 	beq	.cd_stereo16		//
-	cmp	r7, #5			//
-	beq	.cd_stereo4		//
+//	cmp	r7, #5			//
+//	beq	.cd_stereo4		//
+	// error :)
 	
 /********************************************************************
- * 4-bit mono
+ * 4-bit mono [not used]
  *
  * Simple copy
  ********************************************************************/
+ /*
 .cd_mono4:
 	add	r3, r1, lsr#1
 	
@@ -519,12 +542,14 @@ CopyDataToStream:
 	bne	1b
 	
 	b	.cd_next
+ */
 	
 /********************************************************************
- * 4-bit mono
+ * 4-bit stereo [not used]
  *
  * Simple copy
  ********************************************************************/
+ /*
 .cd_stereo4:
 	add	r3, r1, lsr#1
 	ldr	r7,=0xFF00FF
@@ -549,6 +574,7 @@ CopyDataToStream:
 	lsl	r8, #1
 	
 	b	.cd_next
+ */
 
 /********************************************************************
  * 8-bit mono

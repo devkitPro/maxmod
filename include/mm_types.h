@@ -62,7 +62,7 @@ typedef enum
 //-----------------------------------------------------------------------------
 
 typedef mm_word (*mm_callback)( mm_word msg, mm_word param );
-typedef void (*mm_stream_func)( mm_word length, mm_addr dest, mm_stream_formats format );
+typedef mm_word (*mm_stream_func)( mm_word length, mm_addr dest, mm_stream_formats format );
 
 typedef enum
 {
@@ -314,11 +314,13 @@ typedef struct tmm_voice
 } mm_voice;
 //-----------------------------------------------------------------------------
 
-#define MMVF_FREQ		2	// update frequency when this flag is set
-#define MMVF_VOLUME		4	// update volume
-#define MMVF_PANNING	8	// update panning
-#define MMVF_SOURCE		16	// update source and start note
-#define MMVF_STOP		32	// stop voice (cut sound)
+enum {
+	MMVF_FREQ		=2,		// update frequency when this flag is set
+	MMVF_VOLUME		=4,		// update volume
+	MMVF_PANNING	=8,		// update panning
+	MMVF_SOURCE		=16,	// update source and start note
+	MMVF_STOP		=32		// stop voice (cut sound)
+};
 
 //-----------------------------------------------------------------------------
 
