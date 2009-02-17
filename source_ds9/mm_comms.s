@@ -662,6 +662,7 @@ mmEffectEx:
 1:	bl	mmValidateEffectHandle		//
 2:
 	mov	r2, r0				//
+	beq	.no_sfx_handles_availble
 	mov	r5, r0				//-save for return value
 	
 	ldrh	r0, [r4, #MM_SFX_SRC]		// r0 = ssssmm0B
@@ -681,7 +682,12 @@ mmEffectEx:
 	
 	bl	SendString3
 	
+
 	mov	r0, r5				// return handle
+	pop	{r4,r5,pc}
+	
+.no_sfx_handles_availble:
+	mov	r0, #0
 	pop	{r4,r5,pc}
 
 /***********************************************************************
@@ -855,7 +861,10 @@ mmReceiveMessage:
 //.got_sfx:
 	
 	ldr	r1,=sfx_bitmask
-	strh	r0, [r1]
+	ldrh	r2, [r1]
+	bic	r2, r0
+	strh	r2, [r1]
+	//strh	r0, [r1]
 	
 	ldr	r1,=mmActiveStatus
 	lsl	r0, #15

@@ -264,9 +264,11 @@ mmSendUpdateToARM9:
 	ldrb	r0, [r0, #MPL_ISPLAYING]
 	cmp	r0, #0
 	movne	r0, #0x10000
-	ldr	r1,=mm_sfx_bitmask
-	ldr	r1, [r1]
+	ldr	r2,=mm_sfx_clearmask
+	ldr	r1, [r2]
 	orr	r1, r0
+	mov	r0, #0
+	str	r0, [r2]
 	
 	ldr	r0,=mmFifoChannel
 	ldr	r0, [r0]

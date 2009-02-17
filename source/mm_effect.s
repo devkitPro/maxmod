@@ -61,11 +61,13 @@ MM_SFX_SIZE:					// 8 bytes total
 
 	.BSS
 	.ALIGN
-	.GLOBAL mm_sfx_bitmask
+	.GLOBAL mm_sfx_bitmask, mm_sfx_clearmask
 
 mm_sfx_mastervolume:	.space 4
 mm_sfx_channels:	.space 2*channelCount
 mm_sfx_bitmask:		.space 4
+mm_sfx_clearmask:	.space 4
+
 mm_sfx_counter:		.space 1
 
 /***********************************************************************
@@ -398,6 +400,9 @@ mme_clear_channel:
 	lsr	r0, #1				//
 	lsl	r1, r0				//
 	ldr	r2,=mm_sfx_bitmask		//
+	ldr	r0, [r2, #4]
+	orr	r0, r1
+	str	r0, [r2, #4]
 	ldr	r0, [r2]			//
 	bic	r0, r1				//
 	str	r0, [r2]			//
@@ -724,7 +729,15 @@ mmUpdateEffects:
 	
 	lsr	r4, #32-channelCount
 	ldr	r0,=mm_sfx_bitmask
+	ldr	r1, [r0]			// r1 = bits that change from 1->0
+	mov	r2, r1
+	eor	r1, r4
+	and	r1, r2
+
 	str	r4, [r0]
+	ldr	r4, [r0, #4]
+	orr	r4, r1
+	str	r4, [r0, #4]			// write 1->0 mask
 	
 	pop	{r4-r6,pc}
 
