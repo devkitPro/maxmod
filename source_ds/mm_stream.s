@@ -796,7 +796,7 @@ mmStreamBegin:
 	ldr	r0,=SOUND4CNT
 	mov	r1, #0
 	str	r1, [r0]			// clear cnt
-	str	r1, [r4, #8]			// clear tmr/pnt
+	str	r1, [r0, #8]			// clear tmr/pnt
 	
 	ldr	r5, [r4, #v_wave]		// copy src
 	str	r5, [r0, #4]			//
