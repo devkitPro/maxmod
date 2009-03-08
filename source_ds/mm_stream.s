@@ -727,28 +727,34 @@ mmFlushStream:
 						.thumb_func
 mmStreamClose:
 
-	push	{lr}
+	push	{r4, lr}
 	
-	ldr	r3,=mmsData
-	ldrb	r0, [r3, #v_active]
-	cmp	r0, #0
-	beq	.mmsc_exit
+	ldr	r4,=mmsData			// catch already disabled
+	ldrb	r0, [r4, #v_active]		//
+	cmp	r0, #0				//
+	beq	.mmsc_exit			//
 	
-	mov	r0, #0
-	strb	r0, [r3, #v_active]
-	strb	r0, [r3, #v_auto]
+	mov	r0, #0				// disable hardware timer
+	ldr	r1, [r4, #v_hwtimer]		//
+	strh	r0, [r1, #2]			//
 	
-	ldr	r1, [r3, #v_hwtimer]
-	ldr	r0,=TM0CNT
-	sub	r1, r0
-	lsr	r1, #2
-	mov	r0, #8
-	lsl	r0, r1
-	bl	irqDisable
+	ldr	r0,=TM0CNT			// disable irq
+	sub	r1, r0				//
+	lsr	r1, #2				//
+	mov	r0, #8				//
+	lsl	r0, r1				//
+	bl	irqDisable			//
 	
-	bl	mmStreamEnd
+	nop	// ...?
+	nop
+	
+	mov	r0, #0				// disable system
+	strb	r0, [r4, #v_active]		//
+	strb	r0, [r4, #v_auto]		//
+	bl	mmStreamEnd			//
 	
 .mmsc_exit:
+	pop	{r4}
 	pop	{r3}
 	bx	r3
 	
@@ -925,6 +931,8 @@ mmStreamEnd:
 //------------------------------------------------
 	mov	r0, #0b00110000			// 4&5
 	bl	mmUnlockChannels
+	
+	bl	mmRestoreIRQ_t
 	
 	pop	{r4-r5}
 	pop	{r3}
