@@ -462,6 +462,23 @@ WaitUntilZero:
 	
 	bx	lr
 	
+/***********************************************************************
+ * WaitForMemorySignal( address, test )
+ *
+ * Wait until a byte magically becomes 'test'.
+ ***********************************************************************/
+WaitForMemorySignal:
+
+	bic	r2, r0, #0b11111
+	
+.wait2:
+	mcr	p15, 0, r1, c7, c14, 1		// clean and invalidate cache line
+	ldrb	r3, [r0]
+	cmp	r3, r1
+	bne	.wait2
+	
+	bx	lr
+	
 #endif
 	
 /***********************************************************************
@@ -727,7 +744,7 @@ mmFlushStream:
 						.thumb_func
 mmStreamClose:
 
-	push	{r4, lr}
+	push	{r4, r5, lr}
 	
 	ldr	r4,=mmsData			// catch already disabled
 	ldrb	r0, [r4, #v_active]		//
@@ -748,13 +765,33 @@ mmStreamClose:
 	nop	// ...?
 	nop
 	
+	ldr	r5, [r4, #v_wave]		// read byte of wavebuffer (for testing)
+	ldrb	r5, [r5]			//
+	
 	mov	r0, #0				// disable system
 	strb	r0, [r4, #v_active]		//
 	strb	r0, [r4, #v_auto]		//
 	bl	mmStreamEnd			//
 	
+
+	#ifdef SYS_NDS9				// ARM9:
+	
+	ldr	r0, [r4, #v_wave]		// block until arm7 sets 'stop' flag
+	mov	r1, r5				//
+	add	r1, #1				//
+	lsl	r1, #32-8			//
+	lsr	r1, #32-8			//
+	ldr	r2,=WaitForMemorySignal		//
+	blx	r2
+	
+	ldr	r0, [r4, #v_workmem]		// free malloc'd memory
+	bl	free				//
+	ldr	r0, [r4, #v_wave]		//
+	bl	free				//
+	#endif					//
+	
 .mmsc_exit:
-	pop	{r4}
+	pop	{r4, r5}
 	pop	{r3}
 	bx	r3
 	
@@ -903,14 +940,15 @@ mmStreamBegin:
 						.thumb_func
 mmStreamEnd:
 
-	push	{r4-r5, lr}
+	push	{r4-r6, lr}
 	
 	bl	mmSuspendIRQ_t
 	
 	ldr	r1,=SOUND4CNT
 	mov	r2, #0
-	ldr	r0,=mmsData
-	ldrb	r0, [r0, #v_format]
+	ldr	r6,=mmsData
+	ldrb	r0, [r6, #v_format]
+	ldr	r6, [r6, #v_wave]		// <-- for stop signal!!
 	lsr	r0, #1
 	bcc	1f
 
@@ -932,9 +970,13 @@ mmStreamEnd:
 	mov	r0, #0b00110000			// 4&5
 	bl	mmUnlockChannels
 	
+	ldrb	r0, [r6]			// set stop signal
+	add	r0, #1				//
+	strb	r0, [r6]			//
+	
 	bl	mmRestoreIRQ_t
 	
-	pop	{r4-r5}
+	pop	{r4-r6}
 	pop	{r3}
 	bx	r3
 
