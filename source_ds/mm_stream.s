@@ -472,7 +472,7 @@ WaitForMemorySignal:
 	bic	r2, r0, #0b11111
 	
 .wait2:
-	mcr	p15, 0, r1, c7, c14, 1		// clean and invalidate cache line
+	mcr	p15, 0, r2, c7, c14, 1		// clean and invalidate cache line
 	ldrb	r3, [r0]
 	cmp	r3, r1
 	bne	.wait2
@@ -772,7 +772,6 @@ mmStreamClose:
 	strb	r0, [r4, #v_active]		//
 	strb	r0, [r4, #v_auto]		//
 	bl	mmStreamEnd			//
-	
 
 	#ifdef SYS_NDS9				// ARM9:
 	
