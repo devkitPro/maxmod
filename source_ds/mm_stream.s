@@ -139,8 +139,7 @@ mmStreamOpen:
 	
 	mov	r0, #0				// reset timer
 	str	r0, [r5]			//
-	ldr	r1,=StreamCounter		// reset stream counter
-	str	r0, [r1]			//
+	
 	
 	ldrb	r1, [r4, #mms_timer]		// setup irq vector
 	mov	r0, #0x8			//
@@ -237,6 +236,10 @@ mmStreamOpen:
 	sub	r0, #DELAY_SAMPLES		//
 	bl	ForceStreamRequest		//
 //	strh	r0, [r6, #v_pos]
+
+	ldr	r0,=StreamCounter		// reset stream counter
+	mov	r1, #0
+	str	r1, [r0]			//
 		
 //	bl	mmSuspendIRQ_t			// ***********************************************
 	
