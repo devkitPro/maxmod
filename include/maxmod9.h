@@ -445,6 +445,15 @@ void mmStreamUpdate( void );
  
 void mmStreamClose( void );
 
+/*****************************************************************
+ * mmStreamGetPosition()
+ *
+ * Get number of samples elapsed since the stream was opened.
+ * The 32-bit value will wrap every 36 hours or so (at 32khz)
+ *****************************************************************/
+ 
+mm_word mmStreamGetPosition();
+
 
 
 /*****************************************************************

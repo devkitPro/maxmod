@@ -59,6 +59,7 @@ v_remainder:		.space 4
 
 v_size:
 
+
 /***********************************************************************
  *
  * Global Symbols
@@ -68,6 +69,8 @@ v_size:
 	.global mmStreamOpen
 	.global mmStreamUpdate
 	.global mmStreamClose
+	
+	.global mmStreamGetPosition
 
 	.global mmStreamBegin
 	.global mmStreamEnd
@@ -85,6 +88,7 @@ v_size:
 mmsPreviousTimer:	.space 2
 //--------------------------------------------------
 			.align
+StreamCounter:		.space 4
 mmsData:		.space v_size
 //--------------------------------------------------
 
@@ -135,6 +139,8 @@ mmStreamOpen:
 	
 	mov	r0, #0				// reset timer
 	str	r0, [r5]			//
+	ldr	r1,=StreamCounter		// reset stream counter
+	str	r0, [r1]			//
 	
 	ldrb	r1, [r4, #mms_timer]		// setup irq vector
 	mov	r0, #0x8			//
@@ -289,6 +295,55 @@ mmStreamOpen:
 	ret3
 	
 /***********************************************************************
+ * mmStreamGetPosition()
+ *
+ * Get number of samples that have played since start.
+ * 32-bit variable overflows every ~36 hours @ 32khz...
+ ***********************************************************************/
+						.thumb_func
+mmStreamGetPosition:
+	push	{r4,lr}
+	ldr	r4,=mmsData
+	ldrb	r0, [r4, #v_active]
+	
+	cmp	r0, #0			// catch inactive stream
+	bne	1f			//
+2:	mov	r0, #0			//
+_mmsgp_exit:
+	pop	{r4}			//
+	pop	{r3}			//
+	bx	r3			//
+1:	
+	ldrb	r0, [r4, #v_auto]	// catch auto mode
+	cmp	r0, #0			// (only manual mode supported)
+	bne	2b			//
+	
+	//todo: combine this and mmStreamUpdate section into one function
+	
+	ldr	r0, [r4, #v_hwtimer]	//
+	ldrh	r0, [r0]		//
+	ldr	r2,=mmsPreviousTimer	//
+	ldrh	r1, [r2]		//
+	sub	r0, r1			//
+	bpl	1f			//
+	ldr	r1,=65536		//
+	add	r0, r1			//
+1:	
+	lsl	r0, #10			// samples = (t * 1024 + r) / clks
+	ldr	r1, [r4, #v_remainder]	//
+	add	r0, r1			//
+	ldrh	r1, [r4, #v_clks]	//
+					//
+	swi	SWI_DIVIDE		//
+					//
+					
+	ldr	r1,=StreamCounter	// add sample counter
+	ldr	r1, [ r1 ]		//
+	add	r0, r1			//
+	b	_mmsgp_exit
+	
+	
+/***********************************************************************
  * mmStreamUpdate()
  *
  * Update stream with new data.
@@ -350,6 +405,11 @@ STREAM_FORCE_REQUEST:
 	
 	lsr	r0, #2
 	lsl	r0, #2
+	
+	ldr	r1,=StreamCounter
+	ldr	r2, [r1]
+	add	r2, r0
+	str	r2, [r1]
 	
 //------------------------------------------------
 // request data
