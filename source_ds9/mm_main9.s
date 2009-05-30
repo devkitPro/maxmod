@@ -23,7 +23,7 @@
 #include "mp_defs.inc"
 #include "mp_macros.inc"
 
-.equ	FIFO_MAXMOD,	7
+.equ	FIFO_MAXMOD,	3
 
 .struct 0		// mm_ds9_system
 MMDS9S_MOD_COUNT:	.space 4

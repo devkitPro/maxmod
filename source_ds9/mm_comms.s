@@ -131,8 +131,6 @@ F: SELECTMODE		2	[mode]				select audio mode
 
 .equ	MSG_EFFECTCANCELALL,	0x1D + PARAMS_0
 
-.equ	FIFO_MAXMOD,		0x07
-
 .equ	EFFECT_CHANNELS,	16
 
 .struct 0					// mm_sound_effect
