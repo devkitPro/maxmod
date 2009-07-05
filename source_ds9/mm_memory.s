@@ -241,14 +241,14 @@ mmUnloadEffect:		@ params={ msl_id }
 	bne	2f			@ skip unload if sample
 					@   is still referenced
 	
-	push	{r0-r2}
+	push	{r0-r2, r7}
 	ldr	r3,=0x2000000		@ unload sample from memory
 	add	r1, r2, r3		@ param_b = sample address
 	mov	r0, #MMCB_DELETESAMPLE	@ param_a = message
 	ldr	r7,=mmcbMemory		@ jump to callback
 	ldr	r7, [r7]
 	blx	r7
-	pop	{r0-r2}
+	pop	{r0-r2, r7}
 	
 1:
 	mov	r2, #0			@ clear sample entry
