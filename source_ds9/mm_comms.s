@@ -194,12 +194,30 @@ SendSimpleExt:
 SendSimple:
 	lsl	r2, #16				//
 	orr	r0, r2				//
-	mov	r1, r0				//
 	
-	ldr	r0,=mmFifoChannel		// send message
-	ldr	r0, [r0]			//
-	ldr	r2,=fifoSendValue32		//
-	bx	r2				//
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+					// use datamsg instead:
+	lsl	r2, r0, #8		// r2 = param count
+	lsr	r2, #32-2
+	lsr	r1, r0, #24		// r1 = param3
+	lsl	r3, r0, #8+2		// r3 = message number
+	lsr	r3, #24+2
+	add	r2, #1
+	lsl	r0, #8
+	orr	r0, r3
+	lsl	r0, #8
+	orr	r0, r2
+	cmp	r2, #3
+	bgt	SendString2
+	b	SendString1
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+@	mov	r1, r0				//
+@	ldr	r0,=mmFifoChannel		// send message
+@	ldr	r0, [r0]			//
+@	ldr	r2,=fifoSendValue32		//
+@	bx	r2				//
+
 
 /***********************************************************************
  * SendString()
