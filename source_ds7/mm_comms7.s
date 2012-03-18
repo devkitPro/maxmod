@@ -136,7 +136,8 @@ mmFifoChannel:
  *
  * ARM7 Communication Setup
  *******************************************************************/
-						.global mmSetupComms
+	.global mmSetupComms
+	.type mmSetupComms STT_FUNC
 mmSetupComms:
 
 	push	{r0, lr}
@@ -257,7 +258,8 @@ mmReceiveDatamsg:
  *
  * Give ARM9 some data.
  *******************************************************************/
-						.global mmSendUpdateToARM9
+	.global mmSendUpdateToARM9
+	.type mmSendUpdateToARM9 STT_FUNC
 mmSendUpdateToARM9:
 
 	ldr	r0,=mmLayerMain
@@ -281,7 +283,9 @@ mmSendUpdateToARM9:
  *
  * Give ARM9 some data.
  *******************************************************************/
-						.global mmARM9msg
+	.global	mmARM9msg
+	.type	mmARM9msg STT_FUNC
+	
 mmARM9msg:
 	
 	mov	r1, r0
@@ -357,7 +361,8 @@ mmRestoreIRQ:
  *
  * Process messages waiting in the fifo
  *******************************************************************/
-						.global mmProcessComms
+	.global	mmProcessComms
+	.type	mmProcessComms STT_FUNC
 mmProcessComms:
 	
 	push	{r4-r7, lr}

@@ -38,27 +38,37 @@
 @                          GLOBAL SYMBOLS
 @==================================================================
 
-	.global mp_mix_seg
-	.global mp_writepos
 
-	.global mm_mixchannels
+	.global	mmVBlank
+	.type	mmVBlank STT_FUNC
+	.global	mmMixerMix
+	.type	mmMixerMix STT_FUNC
 
-	.global mmVBlank
-	.global mmMixerMix
-
-	.global mmMixerSetSource
-	.global mmMixerSetRead
-	.global mmMixerSetFreq
-	.global mmMixerStopChannel
-	.global mmMixerInit
+	.global	mmMixerSetSource
+	.type	mmMixerSetSource STT_FUNC
+	.global	mmMixerSetRead
+	.type	mmMixerSetRead STT_FUNC
+	.global	mmMixerSetFreq
+	.type	mmMixerSetFreq STT_FUNC
+	.global	mmMixerStopChannel
+	.type	mmMixerStopChannel STT_FUNC
+	.global	mmMixerInit
+	.type	mmMixerInit STT_FUNC
 	.global mmMixerChannelActive
+	.type	mmMixerChannelActive STT_FUNC
 	.global	mmMixerMulFreq
+	.type	mmMixerMulFreq STT_FUNC
 	.global	mmMixerSetVolume
+	.type	mmMixerSetVolume STT_FUNC
 	.global	mmMixerSetPan
+	.type	mmMixerSetPan STT_FUNC
 
 //	.global	mm_freqscalar
 	.global mm_mixlen
 	.global mm_bpmdv
+	.global	mp_mix_seg
+	.global	mp_writepos
+	.global	mm_mixchannels
 
 @===============================================
 @ more definitions

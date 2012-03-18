@@ -34,24 +34,34 @@
 	.global	mm_mix_channels
 	.global	mm_mix_output
 	.global	mm_mix_write
+	.global	mm_mixing_mode
+
 	
-	.global mm_mixing_mode
-	
-	.global mmMixerPre
+	.global	mmMixerPre
+	.type	mmMixerPre STT_FUNC
 	.global	mmMixerMix
-	
+	.type	mmMixerMix STT_FUNC
+
 	.global	mmMixerInit
-	
+
 	.global	mmMixerSetSource
+	.type	mmMixerSetSource STT_FUNC
 	.global	mmMixerSetFreq
+	.type	mmMixerSetFreq STT_FUNC
 	.global	mmMixerMulFreq
+	.type	mmMixerMulFreq STT_FUNC
 	.global	mmMixerStopChannel
+	.type	mmMixerStopChannel STT_FUNC
 	.global	mmMixerChannelActive
+	.type	mmMixerChannelActive STT_FUNC
 	.global	mmMixerSetVolume
+	.type	mmMixerSetVolume STT_FUNC
 	.global	mmMixerSetPan
-	
+	.type	mmMixerSetPan STT_FUNC
+
 	.global	mmSelectMode
-	
+	.type	mmSelectMode STT_FUNC
+
 	.global	mmVolumeTable
 	
 //----------------------------------------------------------------------
