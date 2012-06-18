@@ -132,7 +132,7 @@ DEPENDS	:=	$(OFILES:.o=.d)
 $(TARGET)	:	$(OFILES)
 	@rm -f "$(TARGET)"
 	@$(AR) -rc "$(TARGET)" $(OFILES)
-	@arm-eabi-strip -x "$(TARGET)"
+	@$(PREFIX)strip -x "$(TARGET)"
 	@echo built ... $(SYSTEM) lib
 
 -include $(DEPENDS)
