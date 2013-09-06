@@ -228,7 +228,7 @@ mmEffectEx:
 	ldr	r1,=mm_sfx_bitmask		// set bit
 	ldr	r2, [r1]			//
 	orr	r2, r3				//
-	str	r3, [r1]			//
+	str	r2, [r1]			//
 	
 1:	
 
