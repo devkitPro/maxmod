@@ -63,14 +63,14 @@ INCLUDES	:=	asm_include
 ifeq ($(SYSTEM),GBA)
 
 DEFS	:=	-DSYS_GBA -DUSE_IWRAM
-ARCH	:=	$(XMEM) -mthumb-interwork
+ARCH	:=	$(XMEM) -march=armv4t -mthumb -mthumb-interwork
 
 endif
 
 ifeq ($(SYSTEM),DS7)
 
 DEFS	:=	-DSYS_NDS -DSYS_NDS7
-ARCH	:=	-mthumb-interwork
+ARCH	:=	-march=armv4t -mthumb -mthumb-interwork
 
 endif
 
