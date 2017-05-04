@@ -117,7 +117,7 @@ export LD	:=	$(CC)
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
 	@[ -d lib ] || mkdir -p lib
-	@make --no-print-directory -C $(BUILD) -f $(CURDIR)/maxmod.mak
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/maxmod.mak
  
 #---------------------------------------------------------------------------------
 clean:
