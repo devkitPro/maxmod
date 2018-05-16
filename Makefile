@@ -14,14 +14,18 @@ clean:
 install: install-gba install-nds install-ndse
 
 install-gba: gba
-	cp lib/libmm.a $(DEVKITPRO)/libgba/lib
-	cp include/maxmod.h include/mm_types.h $(DEVKITPRO)/libgba/include
-	cp maxmod_license.txt $(DEVKITPRO)/libgba
+	mkdir -p $(DESTDIR)$(DEVKITPRO)/libgba/include
+	mkdir -p $(DESTDIR)$(DEVKITPRO)/libgba/lib
+	cp lib/libmm.a $(DESTDIR)$(DEVKITPRO)/libgba/lib
+	cp include/maxmod.h include/mm_types.h $(DESTDIR)$(DEVKITPRO)/libgba/include
+	cp maxmod_license.txt $(DESTDIR)$(DEVKITPRO)/libgba
 
 install-nds: ds7 ds9
-	cp lib/libmm7.a lib/libmm9.a $(DEVKITPRO)/libnds/lib
-	cp include/maxmod7.h include/maxmod9.h include/mm_types.h $(DEVKITPRO)/libnds/include
-	cp maxmod_license.txt $(DEVKITPRO)/libnds
+	mkdir -p $(DESTDIR)$(DEVKITPRO)/libnds/include
+	mkdir -p $(DESTDIR)$(DEVKITPRO)/libnds/lib
+	cp lib/libmm7.a lib/libmm9.a $(DESTDIR)$(DEVKITPRO)/libnds/lib
+	cp include/maxmod7.h include/maxmod9.h include/mm_types.h $(DESTDIR)$(DEVKITPRO)/libnds/include
+	cp maxmod_license.txt $(DESTDIR)$(DEVKITPRO)/libnds
 
 install-ndse: ds9e
 
@@ -34,7 +38,7 @@ dist-nds:	ds7 ds9
 	@tar --exclude=.svn -cjvf maxmod-nds-$(VERSTRING).tar.bz2 include/maxmod7.h include/maxmod9.h include/mm_types.h lib/libmm7.a lib/libmm9.a maxmod_license.txt
 
 dist-nds9e: ds9e
-	
+
 dist-src:
 	@tar --exclude=.svn -cvjf maxmod-src-$(VERSTRING).tar.bz2 \
 	asm_include include source* Makefile maxmod.mak maxmod_license.txt
