@@ -85,12 +85,6 @@ mmInitDefault:
 	
 	push	{r0-r7}
 	
-	mov	r0, #1				// setup VBlank IRQ
-	ldr	r1,=mmVBlank			//
-	bl	irqSet				//
-	mov	r0, #1				//
-	bl	irqEnable			//
-	
 	mov	r0, sp				// init maxmod, pass init struct
 	bl	mmInit				//
 	
