@@ -764,6 +764,19 @@ mppStop:
 	bx	r0
 
 /******************************************************************************
+ * mmGetPosition()
+ *
+ * Get playback position
+ ******************************************************************************/
+							.global mmGetPosition
+							.thumb_func
+mmGetPosition:
+	
+	ldr	r1,=mmLayerMain
+	ldrb	r0, [r1, #MPL_POSITION]
+	bx	lr
+	
+/******************************************************************************
  * mmPosition( position )
  *
  * Set playback position
