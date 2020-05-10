@@ -33,7 +33,7 @@ MMDS9S_FIFO_CHANNEL:	.space 4
 
 //-----------------------------------------------------------------------------
 	.BSS
-	.ALIGN
+	.ALIGN 2
 //-----------------------------------------------------------------------------
 
 /******************************************************************************
@@ -212,7 +212,7 @@ mmInitDefault:
 	
 	pop	{r4, r5, pc}			// restore regs and return
 	
-.align
+.align 2
 mmstr_rbHAP:
 	.byte	'r', 'b', 0
 	
@@ -261,7 +261,7 @@ mmSuspendIRQ_t:
 	bx	r0
 
 .arm
-.align
+.align 2
 1:	mrs	r0, cpsr
 	and	r1, r0, #0x80
 	orr	r0, #0x80
@@ -282,7 +282,7 @@ mmRestoreIRQ_t:
 	bx	r0
 
 .arm
-.align
+.align 2
 1:	mrs	r0, cpsr
 	ldr	r1, previous_irq_state
 	bic	r0, #0x80

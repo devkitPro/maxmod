@@ -75,16 +75,16 @@
 .equ ReverbChannelMask,	0b1010
 
 /***********************************************************************
- * 
+ *
  * Memory
  *
  ***********************************************************************/
- 
+
 	.BSS
-	.ALIGN
-	
+	.ALIGN 2
+
 ReverbFlags:
-	.space 2	
+	.space 2
 ReverbNoDryLeft:
 	.space 1
 ReverbNoDryRight:
@@ -98,7 +98,7 @@ ReverbStarted:
 	.TEXT
 	.THUMB
 	.ALIGN 2
-	
+
 /***********************************************************************
  * mmReverbEnable()
  *
