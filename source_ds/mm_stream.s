@@ -82,12 +82,12 @@ v_size:
  ***********************************************************************/
 
 	.BSS
-	.ALIGN
+	.ALIGN 2
 
 //--------------------------------------------------
 mmsPreviousTimer:	.space 2
 //--------------------------------------------------
-			.align
+			.align 2
 StreamCounter:		.space 4
 mmsData:		.space v_size
 //--------------------------------------------------
@@ -494,7 +494,7 @@ ForceStreamRequest:
 	b	STREAM_FORCE_REQUEST
 	
 	.ARM
-	.ALIGN
+	.ALIGN 2
 	
 	
 #ifdef SYS_NDS9

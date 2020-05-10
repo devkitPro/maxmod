@@ -63,7 +63,7 @@
 
 .section .bss
 
-.align
+.align 2
 
 mp_updatesound:		.space 4
 mm_mixchannels:		.space 4

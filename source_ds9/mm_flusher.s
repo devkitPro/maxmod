@@ -24,7 +24,7 @@
 
 .text
 .thumb
-.align
+.align 2
 
 .thumb_func
 @-------------------------------------------------------
@@ -51,7 +51,7 @@ mmFlushBank:
 	bx	r3			@}
 
 .arm
-.align
+.align 2
 	 
 .flushbank:
 	mcr	p15, 0, r0, c7, c14, 1	@-clean and invalidate cache line
