@@ -142,6 +142,14 @@ void mmResume( void );
 void mmStop( void );
 
 /****************************************************************************
+ * mmGetPosition()
+ *
+ * Get playback position.
+ ****************************************************************************/
+
+mm_word mmGetPosition( void );
+
+/****************************************************************************
  * mmPosition()
  *
  * Set playback position.
@@ -150,6 +158,19 @@ void mmStop( void );
  ****************************************************************************/
 
 void mmPosition( mm_word position );
+
+/****************************************************************************
+ * mmSetPosition()
+ *
+ * Set playback position (alias for mmPosition()).
+ *
+ * position: New position in the module sequence.
+ ****************************************************************************/
+
+inline void mmSetPosition( mm_word position )
+{
+    mmPosition( position );
+}
 
 /****************************************************************************
  * mmActive()
@@ -292,6 +313,16 @@ void mmEffectRate( mm_sfxhand handle, mm_word rate );
  ****************************************************************************/
  
 void mmEffectScaleRate( mm_sfxhand handle, mm_word factor );
+
+/****************************************************************************
+ * mmEffectActive( mm_sfxhand handle )
+ *
+ * Indicates if a sound effect is active or not.
+ *
+ * handle : Sound effect handle.
+ ****************************************************************************/
+
+mm_bool mmEffectActive( mm_sfxhand handle );
 
 /****************************************************************************
  * mmEffectCancel( mm_sfxhand handle )
