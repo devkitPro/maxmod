@@ -382,6 +382,27 @@ mme_get_channel_index:
 	mov	r3, #0				//
 	mvn	r3, r3				//
 	bx	lr				//
+
+/***********************************************************************
+ * mmEffectActive( handle )
+ *
+ * Indicates if a sound effect is active or not
+ ***********************************************************************/
+						.global mmEffectActive
+						.thumb_func
+mmEffectActive:
+	push	{lr}				//
+	bl	mme_get_channel_index	//
+	cmp	r3, #0					// if r3 >= 0, it is active
+	bge	.active					//
+	mov	r0, #0					// return false
+	pop	{r3}					//
+	bx	r3						//
+	
+.active:						// 
+	mov	r0, #1					// return true
+	pop	{r3}					//
+	bx	r3						//
 	
 /***********************************************************************
  * mme_clear_channel(ch)
