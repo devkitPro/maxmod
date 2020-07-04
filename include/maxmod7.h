@@ -340,7 +340,7 @@ void mmEffectCancelAll();
  * workbuffer : work memory, must be aligned
  *****************************************************************/
 
-void mmStreamOpen( mm_stream* stream, mm_addr memory );
+void mmStreamOpen( mm_stream* stream, mm_addr wavebuffer, mm_addr workbuffer );
 
 /*****************************************************************
  * mmStreamUpdate()
@@ -358,7 +358,16 @@ void mmStreamUpdate( void );
  * Close audio stream.
  *****************************************************************/
 
-void mmCloseStream( void );
+void mmStreamClose( void );
+
+/*****************************************************************
+ * mmStreamGetPosition()
+ *
+ * Get number of samples elapsed since the stream was opened.
+ * The 32-bit value will wrap every 36 hours or so (at 32khz)
+ *****************************************************************/
+ 
+mm_word mmStreamGetPosition();
 
 
 
