@@ -54,7 +54,7 @@ ifneq ($(GOODSYSTEM),YES)
 $(error "Invalid SYSTEM, valid systems are: GBA, DS7, DS9, DS9E" )
 endif
 
-INCLUDES	:=	asm_include
+INCLUDES	:=	asm_include include $(SOURCES)
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -88,6 +88,7 @@ ARCH	:=	-mthumb-interwork -march=armv5te -mtune=arm946e-s
 
 endif
 
+CFLAGS	:=	$(DEFS) -g -O3 -Wall $(ARCH) $(INCLUDE)
 ASFLAGS	:=	$(DEFS) $(ARCH) $(INCLUDE)
 LDFLAGS	=	$(ARCH) -Wl,-Map,$(notdir $@).map
 
@@ -101,9 +102,10 @@ export TOPDIR	:=	$(CURDIR)
 export DEPSDIR	:=	$(CURDIR)/$(BUILD)
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir))
 
+CFILES			:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 SFILES			:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 
-export OFILES	:=	$(SFILES:.s=.o)
+export OFILES	:=	$(SFILES:.s=.o) $(CFILES:.c=.o)
 
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
