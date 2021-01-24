@@ -149,7 +149,7 @@ typedef struct tmm_mas_ds_sample
 	union {
 		mm_word	loop_length;
 		mm_word	length;
-	}
+	};
 	mm_byte		format;
 	mm_byte		repeat_mode;
 	mm_hword	default_frequency;
@@ -167,5 +167,11 @@ typedef struct tmm_mas_ds_sample
 
 #define MM_SREPEAT_FORWARD	1
 #define MM_SREPEAT_OFF		2
+
+// -----------------------------------------------------------
+
+#include "mp_mas_structs.h"
+
+extern mm_active_channel *mm_achannels;
 
 #endif

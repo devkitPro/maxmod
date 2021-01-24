@@ -5,6 +5,7 @@
  *              / / / / / / /_/ />  </ / / / / / /_/ / /_/ /                *
  *             /_/ /_/ /_/\__,_/_/|_/_/ /_/ /_/\____/\__,_/                 *
  *                                                                          *
+ *      Copyright (c) 2021, Antonio Niño Díaz (antonio_nd@outlook.com)      *
  *         Copyright (c) 2008, Mukunda Johnson (mukunda@maxmod.org)         *
  *                                                                          *
  * Permission to use, copy, modify, and/or distribute this software for any *
@@ -20,36 +21,11 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           *
  ****************************************************************************/
 
-// MAXMOD SOUNDBANK FORMAT DEFINITIONS
-
-#ifndef MM_MSL_H
-#define MM_MSL_H
+#ifndef MM_MAS_ARM_H
+#define MM_MAS_ARM_H
 
 #include "mm_types.h"
 
-typedef struct tmslhead
-{
-	mm_hword	sampleCount;
-	mm_hword	moduleCount;
-	mm_word		reserved[2];
-	mm_addr		sampleTable[]; // [MSL_NSAMPS];
-	//mm_addr	moduleTable[MSL_NSONGS];
-} msl_head;
+mm_word mmAllocChannel(void);
 
-// sample structure......................................
-#define C_SAMPLE_LEN        0
-#define C_SAMPLE_LOOP       4
-#define C_SAMPLE_POINT      12
-#define C_SAMPLE_DATA       16
-
-#define C_SAMPLEN_LSTART    0
-#define C_SAMPLEN_LEN       4
-#define C_SAMPLEN_FORMAT    8
-#define C_SAMPLEN_REP       9
-#define C_SAMPLEN_POINT     12
-#define C_SAMPLEN_DATA      16
-
-#define C_SAMPLEC_DFREQ     10
-
-#endif
-
+#endif // MM_MAS_ARM_H

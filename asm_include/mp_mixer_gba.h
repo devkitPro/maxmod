@@ -5,6 +5,7 @@
  *              / / / / / / /_/ />  </ / / / / / /_/ / /_/ /                *
  *             /_/ /_/ /_/\__,_/_/|_/_/ /_/ /_/\____/\__,_/                 *
  *                                                                          *
+ *      Copyright (c) 2021, Antonio Niño Díaz (antonio_nd@outlook.com)      *
  *         Copyright (c) 2008, Mukunda Johnson (mukunda@maxmod.org)         *
  *                                                                          *
  * Permission to use, copy, modify, and/or distribute this software for any *
@@ -20,36 +21,23 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           *
  ****************************************************************************/
 
-// MAXMOD SOUNDBANK FORMAT DEFINITIONS
+#ifndef MP_MIXER_GBA_H
+#define MP_MIXER_GBA_H
 
-#ifndef MM_MSL_H
-#define MM_MSL_H
+#include <assert.h>
 
 #include "mm_types.h"
 
-typedef struct tmslhead
-{
-	mm_hword	sampleCount;
-	mm_hword	moduleCount;
-	mm_word		reserved[2];
-	mm_addr		sampleTable[]; // [MSL_NSAMPS];
-	//mm_addr	moduleTable[MSL_NSONGS];
-} msl_head;
+typedef struct {
+    mm_word     src;
+    mm_word     read;
+    mm_byte     vol;
+    mm_byte     pan;
+    mm_byte     unused_0;
+    mm_byte     unused_1;
+    mm_word     freq;
+} mm_mixer_channel;
 
-// sample structure......................................
-#define C_SAMPLE_LEN        0
-#define C_SAMPLE_LOOP       4
-#define C_SAMPLE_POINT      12
-#define C_SAMPLE_DATA       16
+static_assert(sizeof(mm_mixer_channel) == 16);
 
-#define C_SAMPLEN_LSTART    0
-#define C_SAMPLEN_LEN       4
-#define C_SAMPLEN_FORMAT    8
-#define C_SAMPLEN_REP       9
-#define C_SAMPLEN_POINT     12
-#define C_SAMPLEN_DATA      16
-
-#define C_SAMPLEC_DFREQ     10
-
-#endif
-
+#endif // MP_MIXER_GBA_H
