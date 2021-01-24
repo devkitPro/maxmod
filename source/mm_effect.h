@@ -21,14 +21,12 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           *
  ****************************************************************************/
 
-#ifndef MM_MIXER_GBA_H
-#define MM_MIXER_GBA_H
+#ifndef MM_EFFECT_H
+#define MM_EFFECT_H
 
-#include "mp_mixer_gba.h"
+#include "mm_types.h"
 
-extern mm_word mm_mixlen;
-extern mm_mixer_channel *mm_mixchannels;
+void mmResetEffects(void);
+void mmUpdateEffects(void);
 
-void mmMixerInit(mm_gba_system* setup);
-
-#endif // MM_MIXER_GBA_H
+#endif // MM_EFFECT_H

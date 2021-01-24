@@ -172,6 +172,20 @@ typedef struct tmm_mas_ds_sample
 
 #include "mp_mas_structs.h"
 
+extern mpl_layer_information mmLayerMain;
+extern mpl_layer_information mmLayerSub;
+
+extern mpl_layer_information *mpp_layerp;
+extern mm_word mpp_channels;
+
+extern mm_byte mpp_nchannels;
+extern mm_byte mpp_clayer;
 extern mm_active_channel *mm_achannels;
+extern mm_word mm_pchannels;
+extern mm_word mm_num_mch;
+extern mm_word mm_num_ach;
+
+void mppUpdateSub(void);
+void mppProcessTick(void); // TODO: Mark this as IWRAM in GBA?
 
 #endif
