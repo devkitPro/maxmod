@@ -332,7 +332,7 @@ mm_bool mmEffectActive( mm_sfxhand handle );
  * handle : Sound effect handle.
  ****************************************************************************/
 
-void mmEffectCancel( mm_sfxhand handle );
+mm_word mmEffectCancel( mm_sfxhand handle );
 
 /****************************************************************************
  * mmEffectRelease( mm_sfxhand handle )
