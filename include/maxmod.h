@@ -142,9 +142,25 @@ void mmResume( void );
 void mmStop( void );
 
 /****************************************************************************
+ * mmGetPositionTick()
+ *
+ * Get current number of elapsed ticks in the row being played.
+ ****************************************************************************/
+
+mm_word mmGetPositionTick( void );
+
+/****************************************************************************
+ * mmGetPositionRow()
+ *
+ * Get current row being played.
+ ****************************************************************************/
+
+mm_word mmGetPositionRow( void );
+
+/****************************************************************************
  * mmGetPosition()
  *
- * Get playback position.
+ * Get current pattern order being played.
  ****************************************************************************/
 
 mm_word mmGetPosition( void );

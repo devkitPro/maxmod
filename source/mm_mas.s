@@ -764,9 +764,35 @@ mppStop:
 	bx	r0
 
 /******************************************************************************
+ * mmGetPositionTick()
+ *
+ * Get current number of elapsed ticks in the row being played.
+ ******************************************************************************/
+							.global mmGetPositionTick
+							.thumb_func
+mmGetPositionTick:
+
+	ldr	r0,=mmLayerMain
+	ldrb	r0, [r0, #MPL_TICK]
+	bx	lr
+
+/******************************************************************************
+ * mmGetPositionRow()
+ *
+ * Get current row being played.
+ ******************************************************************************/
+							.global mmGetPositionRow
+							.thumb_func
+mmGetPositionRow:
+
+	ldr	r0,=mmLayerMain
+	ldrb	r0, [r0, #MPL_ROW]
+	bx	lr
+
+/******************************************************************************
  * mmGetPosition()
  *
- * Get playback position
+ * Get current pattern order being played.
  ******************************************************************************/
 							.global mmGetPosition
 							.thumb_func
