@@ -94,7 +94,7 @@
 	
 	.equ	REG_TM0CNT,	0x4000100
 	
-	.equ	REG_DMA,	0x40000BC
+	.equ	REG_DMA,	0x40000BC @ DMA1
 	.equ	DMA_ENABLE,	(1<<31)
 	.equ	DMA_32BIT,	(1<<26)
 	.equ	DMA_CONTROL,	(DMA_ENABLE|DMA_32BIT)
@@ -109,7 +109,11 @@
 	
 	.equ	SOUNDxCNT_ENABLE,	0x80000000
 	
-	.equ	TIMER,			0x4000100
+#ifndef SYS_CALICO
+	.equ	TIMER,			0x4000100 @ Timer 0
+#else
+	.equ	TIMER,			0x4000104 @ Timer 1 (Timer 0 is reserved for the microphone)
+#endif
 	.equ	TIMER_BIT,		0x08
 	
 	.equ	SWTIMER,		0x4000104

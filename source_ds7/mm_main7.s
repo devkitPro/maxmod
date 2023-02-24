@@ -290,12 +290,15 @@ mmIsInitialized:
 						.thumb_func
 mmInit7:
 	push	{lr}
+
+#ifndef SYS_CALICO
 	mov	r0, #0x08
 	ldr	r1,=mmFrame
 	bl	irqSet
 
 	mov	r0, #0x08
 	bl	irqEnable
+#endif
 
 	ldr	r0,=0x400			// set volumes
 	bl	mmSetModuleVolume		//
@@ -330,8 +333,10 @@ mmInit7:
 
 	bl	mmMixerInit			// setup mixer
 
+#ifndef SYS_CALICO
 	ldr	r0,=mmEventForwarder		// forward events
 	bl	mmSetEventHandler
+#endif
 
 	ldr	r0,=mmInitialized		// set initialized flag
 	mov	r1, #42				//
@@ -340,6 +345,8 @@ mmInit7:
 .exit_r3:
 	pop	{r3}
 	bx	r3
+
+#ifndef SYS_CALICO
 
 /******************************************************************************
  * mmInstall( channel )
@@ -376,6 +383,8 @@ mmEventForwarder:
 	bl	mmARM9msg
 	pop	{pc}
 
+#endif
+
 /******************************************************************************
  * mmGetSoundBank( n_songs, bank )
  *
@@ -396,6 +405,8 @@ mmGetSoundBank:
 //------------------------------------------------
 
 	b	mmInit7
+
+#ifndef SYS_CALICO
 
 /******************************************************************************
  * mmFrame()
@@ -429,6 +440,8 @@ mmFrame:
 1:	bl	mmProcessComms		// process communications
 
 	ret1
+
+#endif
 
 .pool
 
