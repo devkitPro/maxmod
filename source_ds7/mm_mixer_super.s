@@ -1685,7 +1685,7 @@ mm_mix_pcm16:
 	and	r1, r0, #1			// mask low bit
 	add	rsrc, rsrc, r1, lsl#1		// add offset to fetch pointer
 	stmfd	sp!, {r0}
-	add	rsrc, rsrc, #1			// we will only use the high byte of each sample :\
+	add	rsrc, rsrc, #1			// we will only use the high byte of each sample :\ sad
 	
 //-----------------------------------------------------------------------
 .macro	mix16w	sa
