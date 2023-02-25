@@ -25,13 +25,16 @@
 #ifndef MM_TYPES_H
 #define MM_TYPES_H
 
-typedef unsigned int	mm_word;	// 32 bits
-typedef unsigned short	mm_hword;	// 16 bits
-typedef unsigned char	mm_byte;	// 8 bits
+#include <stdint.h>
+#include <stdbool.h>
 
-typedef unsigned short	mm_sfxhand;	// sound effect handle
+typedef uint32_t		mm_word;	// 32 bits
+typedef uint16_t		mm_hword;	// 16 bits
+typedef  uint8_t		mm_byte;	// 8 bits
 
-typedef unsigned char	mm_bool;	// boolean value
+typedef uint16_t		mm_sfxhand;	// sound effect handle
+
+typedef bool			mm_bool;	// boolean value
 
 typedef void*			mm_addr;	// pointer
 typedef void*			mm_reg;		// hardware register
