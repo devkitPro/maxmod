@@ -230,14 +230,14 @@ void mmPlayModule( mm_word address, mm_word mode, mm_word layer );
 mm_sfxhand mmEffect( mm_word sample_ID );
 
 /*****************************************************************
- * mmEffectEx( mm_sound_effect* sound )
+ * mmEffectEx( const mm_sound_effect* sound )
  *
  * Play a sound effect with the parameters supplied.
  *
  * sound : Sound effect attributes.
  *****************************************************************/
 
-mm_sfxhand mmEffectEx( mm_sound_effect* sound );
+mm_sfxhand mmEffectEx( const mm_sound_effect* sound );
 
 /*****************************************************************
  * mmEffectVolume( mm_sfxhand handle, mm_word volume )
@@ -331,7 +331,7 @@ void mmEffectCancelAll();
 
 
 /*****************************************************************
- * mmStreamOpen( mm_stream* stream, mm_addr wavebuffer, mm_addr workbuffer )
+ * mmStreamOpen( const mm_stream* stream, mm_addr wavebuffer, mm_addr workbuffer )
  *
  * Open audio stream.
  *
@@ -340,7 +340,7 @@ void mmEffectCancelAll();
  * workbuffer : work memory, must be aligned
  *****************************************************************/
 
-void mmStreamOpen( mm_stream* stream, mm_addr wavebuffer, mm_addr workbuffer );
+void mmStreamOpen( const mm_stream* stream, mm_addr wavebuffer, mm_addr workbuffer );
 
 /*****************************************************************
  * mmStreamUpdate()
@@ -394,7 +394,7 @@ void mmReverbEnable( void );
  * config : Configuration data.
  *****************************************************************/
  
-void mmReverbConfigure( mm_reverb_cfg* config );
+void mmReverbConfigure( const mm_reverb_cfg* config );
 
 /*****************************************************************
  * mmReverbStart( mm_reverbch channels )

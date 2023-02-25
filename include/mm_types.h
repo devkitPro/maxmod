@@ -213,7 +213,7 @@ typedef struct t_mmdssystem
 	
 // pass pointer to memory buffer
 // (mm_word mem_bank[MSL_BANKSIZE])
-	mm_word*	mem_bank;
+	mm_addr		mem_bank;
 	
 // fifo channel to use (usually 7)
 	mm_word		fifo_channel;
