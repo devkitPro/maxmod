@@ -4,6 +4,8 @@ project(maxmod
 	LANGUAGES C ASM
 )
 
+include(GNUInstallDirs)
+
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 	set(CMAKE_INSTALL_PREFIX "${NDS_ROOT}" CACHE PATH "" FORCE)
 endif()
@@ -46,5 +48,22 @@ if(ARM7)
 
 		source_ds7/mm_main7.s
 		source_ds7/mm_mixer_super.s
+
+		source_calico/mm_comms7.c
+	)
+
+	# Install the headers
+	install(
+		DIRECTORY ${PROJECT_SOURCE_DIR}/include/
+		DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+		FILES_MATCHING
+			PATTERN maxmod7.h
+			PATTERN mm_types.h
 	)
 endif()
+
+# Install the library
+install(
+	TARGETS mm
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
