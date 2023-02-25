@@ -43,6 +43,22 @@ typedef struct mmPxiArgBank {
 	void* mm_bank;
 } mmPxiArgBank;
 
+typedef union mmPxiImmSelChan {
+	unsigned imm;
+	struct {
+		unsigned mask : 16;
+		unsigned lock : 1;
+	};
+} mmPxiImmSelChan;
+
+typedef union mmPxiImmStart {
+	unsigned imm;
+	struct {
+		unsigned id   : 16;
+		unsigned mode : 1;  // mm_pmode
+	};
+} mmPxiImmStart;
+
 MM_CONSTEXPR u32 mmPxiMakeCmdMsg(mmPxiCmd cmd, unsigned imm)
 {
 	return (cmd & 0x1f) | (imm << 5);

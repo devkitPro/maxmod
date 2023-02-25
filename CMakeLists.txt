@@ -62,6 +62,22 @@ if(ARM7)
 	)
 endif()
 
+if(ARM9)
+	target_compile_definitions(mm PRIVATE SYS_NDS9)
+	target_sources(mm PRIVATE
+		source_calico/mm_comms9.c
+	)
+
+	# Install the headers
+	install(
+		DIRECTORY ${PROJECT_SOURCE_DIR}/include/
+		DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+		FILES_MATCHING
+			PATTERN maxmod9.h
+			PATTERN mm_types.h
+	)
+endif()
+
 # Install the library
 install(
 	TARGETS mm

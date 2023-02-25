@@ -109,18 +109,18 @@ MEOW_NOINLINE static void _mmProcessPxiCmd(mmPxiCmd cmd, unsigned imm, const voi
 		}
 
 		case mmPxiCmd_SelChan: {
-			bool is_lock = (imm & (1U<<16)) != 0;
-			imm &= 0xffff;
-			if (is_lock) {
-				mmLockChannels(imm);
+			mmPxiImmSelChan u = { imm };
+			if (u.lock) {
+				mmLockChannels(u.mask);
 			} else {
-				mmUnlockChannels(imm);
+				mmUnlockChannels(u.mask);
 			}
 			break;
 		}
 
 		case mmPxiCmd_Start: {
-			mmStart(*(const mm_word*)body, (mm_pmode)imm);
+			mmPxiImmStart u = { imm };
+			mmStart(u.id, (mm_pmode)u.mode);
 			break;
 		}
 
