@@ -14,6 +14,7 @@ static Mailbox s_mmMailbox, s_mmPxiMailbox;
 static u32 s_mmPxiMailboxSlots[MM_PXI_NUM_CREDITS];
 
 extern u8 mmInitialized;
+extern u32 mm_sfx_clearmask;
 
 MEOW_CODE32 MEOW_NOINLINE static void _mmProcessComms(void);
 
@@ -203,6 +204,59 @@ MEOW_NOINLINE static void _mmProcessPxiCmd(mmPxiCmd cmd, unsigned imm, const voi
 			break;
 		}
 
+		case mmPxiCmd_Effect: {
+			const mmPxiArgEffect* arg = (const mmPxiArgEffect*)body;
+			mm_sound_effect sound = {
+				.id      = arg->arg,
+				.rate    = 0x400,
+				.handle  = arg->handle,
+				.volume  = 0xff,
+				.panning = 0x80,
+			};
+			mmEffectEx(&sound);
+			break;
+		}
+
+		case mmPxiCmd_EffectVol: {
+			const mmPxiArgEffect* arg = (const mmPxiArgEffect*)body;
+			mmEffectVolume(arg->handle, arg->arg);
+			break;
+		}
+
+		case mmPxiCmd_EffectPan: {
+			const mmPxiArgEffect* arg = (const mmPxiArgEffect*)body;
+			mmEffectPanning(arg->handle, arg->arg);
+			break;
+		}
+
+		case mmPxiCmd_EffectRate: {
+			const mmPxiArgEffect* arg = (const mmPxiArgEffect*)body;
+			mmEffectRate(arg->handle, arg->arg);
+			break;
+		}
+
+		case mmPxiCmd_EffectMulRate: {
+			const mmPxiArgEffect* arg = (const mmPxiArgEffect*)body;
+			mmEffectScaleRate(arg->handle, arg->arg);
+			break;
+		}
+
+		case mmPxiCmd_EffectOpt: {
+			mmPxiImmEffectOpt u = { imm };
+			if (u.opt) {
+				mmEffectRelease(u.handle);
+			} else {
+				mmEffectCancel(u.handle);
+			}
+			break;
+		}
+
+		case mmPxiCmd_EffectEx: {
+			const mm_sound_effect* arg = (const mm_sound_effect*)body;
+			mmEffectEx(arg);
+			break;
+		}
+
 		case mmPxiCmd_EffectCancelAll: {
 			mmEffectCancelAll();
 			break;
@@ -237,6 +291,12 @@ void _mmProcessComms(void)
 			// Process command
 			_mmProcessPxiCmd(cmd, imm, body, num_words);
 		}
+	}
+
+	if (mm_sfx_clearmask) {
+		// Return effect channels to arm9
+		_mmSendEvent(mmPxiEvent_EffEnd, mm_sfx_clearmask);
+		mm_sfx_clearmask = 0;
 	}
 
 	if (credits) {

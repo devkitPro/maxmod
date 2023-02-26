@@ -323,7 +323,7 @@ mm_sfxhand mmEffectEx( const mm_sound_effect* sound );
  * volume : 0..255 = silent..normal
  *****************************************************************/
 
-void mmEffectVolume( mm_sfxhand handle, mm_word volume );
+void mmEffectVolume( mm_sfxhand handle, mm_byte volume );
 
 /*****************************************************************
  * mmEffectPanning( mm_sfxhand handle, mm_byte panning )

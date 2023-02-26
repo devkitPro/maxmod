@@ -271,15 +271,15 @@ mm_sfxhand mmEffect( mm_word sample_ID );
 mm_sfxhand mmEffectEx( const mm_sound_effect* sound );
 
 /*****************************************************************
- * mmEffectVolume( mm_sfxhand handle, mm_word volume )
+ * mmEffectVolume( mm_sfxhand handle, mm_byte volume )
  *
  * Set the volume of a sound effect.
  *
  * handle : Sound effect handle.
- * volume : 0->65535
+ * volume : 0->255
  *****************************************************************/
  
-void mmEffectVolume( mm_sfxhand handle, mm_word volume );
+void mmEffectVolume( mm_sfxhand handle, mm_byte volume );
 
 /*****************************************************************
  * mmEffectPanning( mm_sfxhand handle, mm_word panning )

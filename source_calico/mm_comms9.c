@@ -3,7 +3,13 @@
 #include "mm_pxi.h"
 
 mm_ds_system s_mmState;
+static mm_bool s_mmActiveStatus;
 static mm_callback s_mmCallback;
+
+static struct {
+	u16 used_mask;
+	u8 instances[16];
+} s_mmEffState;
 
 MM_INLINE void _mmIssueCmd(mmPxiCmd cmd, unsigned imm, const void* arg, size_t arg_size)
 {
@@ -40,13 +46,17 @@ static void _mmPxiHandler(unsigned extra_words, void* user, u32 msg)
 			break;
 		}
 
-		case mmPxiEvent_Status: {
-			// TODO: Handle
+		case mmPxiEvent_EffEnd: {
+			s_mmEffState.used_mask &= ~imm;
 			break;
 		}
 
-		case mmPxiEvent_SongMsg:
 		case mmPxiEvent_SongEnd: {
+			s_mmActiveStatus = false;
+			// fallthrough
+		}
+
+		case mmPxiEvent_SongMsg: {
 			if (s_mmCallback) {
 				s_mmCallback(evt == mmPxiEvent_SongMsg ? MMCB_SONGMESSAGE : MMCB_SONGFINISHED, imm);
 			}
@@ -113,21 +123,25 @@ void mmStart(mm_word module_ID, mm_pmode mode)
 	};
 
 	_mmIssueCmd(mmPxiCmd_Start, u.imm, NULL, 0);
+	s_mmActiveStatus = true;
 }
 
 void mmPause(void)
 {
 	_mmIssueCmd(mmPxiCmd_Pause, 0, NULL, 0);
+	s_mmActiveStatus = false;
 }
 
 void mmResume(void)
 {
 	_mmIssueCmd(mmPxiCmd_Resume, 0, NULL, 0);
+	s_mmActiveStatus = true;
 }
 
 void mmStop(void)
 {
 	_mmIssueCmd(mmPxiCmd_Stop, 0, NULL, 0);
+	s_mmActiveStatus = false;
 }
 
 void mmPosition(mm_word position)
@@ -160,46 +174,132 @@ void mmSetModulePitch(mm_word pitch)
 	_mmIssueCmd(mmPxiCmd_MasterPitch, pitch, NULL, 0);
 }
 
+mm_bool mmActive(void)
+{
+	return s_mmActiveStatus;
+}
+
+MM_INLINE bool _mmValidateEffectHandle(mm_sfxhand handle)
+{
+	int id = (handle & 0xff) - 1;
+	int inst = handle >> 8;
+
+	return id >= 0 && id < 16 && (s_mmEffState.used_mask & (1U<<id)) && s_mmEffState.instances[id] == inst;
+}
+
+static mm_sfxhand _mmCreateEffectHandle(void)
+{
+#ifdef SYS_CALICO
+	IrqState st = irqLock();
+#else
+	int cS = enterCriticalSection();
+#endif
+
+	int id = __builtin_ffs((u16)~s_mmEffState.used_mask)-1;
+	if (id >= 0) {
+		s_mmEffState.used_mask |= 1U << id;
+	}
+
+#ifdef SYS_CALICO
+	irqUnlock(st);
+#else
+	leaveCriticalSection(cS);
+#endif
+
+	if (id < 0) {
+		return 0;
+	}
+
+	return (id+1) | ((++s_mmEffState.instances[id]) << 8);
+}
+
 mm_sfxhand mmEffect(mm_word sample_ID)
 {
-	// TODO
-	return 0;
+	mmPxiArgEffect arg = {
+		.handle = _mmCreateEffectHandle(),
+		.arg    = sample_ID,
+	};
+
+	if (arg.handle) {
+		_mmIssueCmd(mmPxiCmd_Effect, 0, &arg, sizeof(arg));
+	}
+
+	return arg.handle;
 }
 
 mm_sfxhand mmEffectEx(const mm_sound_effect* sound)
 {
-	// TODO
-	return 0;
+	mm_sound_effect arg = *sound; // struct copy
+
+	if (!_mmValidateEffectHandle(arg.handle)) {
+		arg.handle = _mmCreateEffectHandle();
+	}
+
+	if (arg.handle) {
+		_mmIssueCmd(mmPxiCmd_EffectEx, 0, &arg, sizeof(arg));
+	}
+
+	return arg.handle;
 }
 
-void mmEffectVolume(mm_sfxhand handle, mm_word volume)
+void mmEffectVolume(mm_sfxhand handle, mm_byte volume)
 {
-	// TODO
+	mmPxiArgEffect arg = {
+		.handle = handle,
+		.arg    = volume,
+	};
+
+	_mmIssueCmd(mmPxiCmd_EffectVol, 0, &arg, sizeof(arg));
 }
 
 void mmEffectPanning(mm_sfxhand handle, mm_byte panning)
 {
-	// TODO
+	mmPxiArgEffect arg = {
+		.handle = handle,
+		.arg    = panning,
+	};
+
+	_mmIssueCmd(mmPxiCmd_EffectPan, 0, &arg, sizeof(arg));
 }
 
 void mmEffectRate(mm_sfxhand handle, mm_word rate)
 {
-	// TODO
+	mmPxiArgEffect arg = {
+		.handle = handle,
+		.arg    = rate,
+	};
+
+	_mmIssueCmd(mmPxiCmd_EffectRate, 0, &arg, sizeof(arg));
 }
 
 void mmEffectScaleRate(mm_sfxhand handle, mm_word factor)
 {
-	// TODO
+	mmPxiArgEffect arg = {
+		.handle = handle,
+		.arg    = factor,
+	};
+
+	_mmIssueCmd(mmPxiCmd_EffectMulRate, 0, &arg, sizeof(arg));
+}
+
+static void _mmEffectOpt(mm_sfxhand handle, unsigned opt)
+{
+	mmPxiImmEffectOpt u = {
+		.handle = handle,
+		.opt    = opt,
+	};
+
+	_mmIssueCmd(mmPxiCmd_EffectOpt, u.imm, NULL, 0);
 }
 
 void mmEffectCancel(mm_sfxhand handle)
 {
-	// TODO
+	_mmEffectOpt(handle, 0);
 }
 
 void mmEffectRelease(mm_sfxhand handle)
 {
-	// TODO
+	_mmEffectOpt(handle, 1);
 }
 
 void mmSetEffectsVolume(mm_word volume)

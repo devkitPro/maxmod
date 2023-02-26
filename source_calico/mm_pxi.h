@@ -41,15 +41,20 @@ typedef enum mmPxiCmd {
 
 typedef enum mmPxiEvent {
 	mmPxiEvent_Credits = 0,
-	mmPxiEvent_Status  = 1,
-	mmPxiEvent_SongMsg = 2,
-	mmPxiEvent_SongEnd = 3,
+	mmPxiEvent_EffEnd  = 1,
+	mmPxiEvent_SongEnd = 2,
+	mmPxiEvent_SongMsg = 3,
 } mmPxiEvent;
 
 typedef struct mmPxiArgBank {
 	u16 num_songs;
 	void* mm_bank;
 } mmPxiArgBank;
+
+typedef struct mmPxiArgEffect {
+	u32 handle : 16;
+	u32 arg    : 16;
+} mmPxiArgEffect;
 
 typedef union mmPxiImmSelChan {
 	unsigned imm;
@@ -66,6 +71,14 @@ typedef union mmPxiImmStart {
 		unsigned mode : 1;  // mm_pmode
 	};
 } mmPxiImmStart;
+
+typedef union mmPxiImmEffectOpt {
+	unsigned imm;
+	struct {
+		unsigned handle : 16;
+		unsigned opt    : 5;
+	};
+} mmPxiImmEffectOpt;
 
 MM_CONSTEXPR u32 mmPxiMakeCmdMsg(mmPxiCmd cmd, unsigned imm)
 {
