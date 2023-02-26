@@ -9,6 +9,7 @@
 #include <libnds.h>
 #define MM_INLINE    static inline
 #define MM_CONSTEXPR static inline
+#define armDCacheFlush DC_FlushRange
 #endif
 
 #define MM_PXI_NUM_CREDITS 64

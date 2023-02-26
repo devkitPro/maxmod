@@ -2,7 +2,7 @@
 #include <mm_msl.h>
 #include "mm_pxi.h"
 
-static mm_ds_system s_mmState;
+mm_ds_system s_mmState;
 
 MM_INLINE void _mmIssueCmd(mmPxiCmd cmd, unsigned imm, const void* arg, size_t arg_size)
 {

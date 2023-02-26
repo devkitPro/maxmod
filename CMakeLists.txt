@@ -66,6 +66,7 @@ if(ARM9)
 	target_compile_definitions(mm PRIVATE SYS_NDS9)
 	target_sources(mm PRIVATE
 		source_calico/mm_comms9.c
+		source_calico/mm_loader.c
 	)
 
 	# Install the headers
