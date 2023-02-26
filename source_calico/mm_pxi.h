@@ -6,7 +6,7 @@
 #define MM_CONSTEXPR MEOW_CONSTEXPR
 #define PxiChannel_Maxmod ((PxiChannel)22)
 #else
-#include <libnds.h>
+#include <nds.h>
 #define MM_INLINE    static inline
 #define MM_CONSTEXPR static inline
 #define armDCacheFlush DC_FlushRange

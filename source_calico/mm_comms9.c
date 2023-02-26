@@ -18,7 +18,7 @@ MM_INLINE void _mmIssueCmd(mmPxiCmd cmd, unsigned imm, const void* arg, size_t a
 		pxiSend(PxiChannel_Maxmod, mmPxiMakeCmdMsg(cmd, imm));
 	}
 #else
-	// TODO: libnds-calico codepath
+	fifoSendMsg(FIFO_MAXMOD, msg, arg_size_words, (const u32*)arg);
 #endif
 }
 
@@ -29,7 +29,7 @@ void mmInit(const mm_ds_system* system)
 #ifdef SYS_CALICO
 	pxiWaitRemote(PxiChannel_Maxmod);
 #else
-	// TODO: libnds-calico codepath
+	fifoWaitRemote(FIFO_MAXMOD);
 #endif
 
 	mmPxiArgBank arg = {

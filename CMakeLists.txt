@@ -20,6 +20,14 @@ else()
 	message(FATAL_ERROR "Invalid processor, must be armv4t or armv5te")
 endif()
 
+if("${DKP_NDS_PLATFORM_LIBRARY}" STREQUAL "calico")
+	set(CALICO TRUE)
+endif()
+
+if(ARM7 AND NOT CALICO)
+	message(FATAL_ERROR "NDS ARM7 must be built with calico")
+endif()
+
 # Define static library target
 add_library(mm STATIC)
 set_target_properties(mm PROPERTIES RELEASE_POSTFIX    "${PLATFORM_SUFFIX}")
@@ -30,10 +38,10 @@ target_compile_options(mm PRIVATE
 	-Wall -Werror
 )
 
-target_compile_definitions(mm PRIVATE
-	SYS_CALICO
-	SYS_NDS
-)
+target_compile_definitions(mm PRIVATE SYS_NDS)
+if(CALICO)
+	target_compile_definitions(mm PRIVATE SYS_CALICO)
+endif()
 
 # Add include directories
 target_include_directories(mm PRIVATE asm_include include)
