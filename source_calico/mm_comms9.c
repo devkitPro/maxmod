@@ -132,7 +132,7 @@ void mmStop(void)
 
 void mmPosition(mm_word position)
 {
-	// TODO
+	_mmIssueCmd(mmPxiCmd_Position, position, NULL, 0);
 }
 
 void mmJingle(mm_word module_ID)
@@ -158,4 +158,56 @@ void mmSetModuleTempo(mm_word tempo)
 void mmSetModulePitch(mm_word pitch)
 {
 	_mmIssueCmd(mmPxiCmd_MasterPitch, pitch, NULL, 0);
+}
+
+mm_sfxhand mmEffect(mm_word sample_ID)
+{
+	// TODO
+	return 0;
+}
+
+mm_sfxhand mmEffectEx(const mm_sound_effect* sound)
+{
+	// TODO
+	return 0;
+}
+
+void mmEffectVolume(mm_sfxhand handle, mm_word volume)
+{
+	// TODO
+}
+
+void mmEffectPanning(mm_sfxhand handle, mm_byte panning)
+{
+	// TODO
+}
+
+void mmEffectRate(mm_sfxhand handle, mm_word rate)
+{
+	// TODO
+}
+
+void mmEffectScaleRate(mm_sfxhand handle, mm_word factor)
+{
+	// TODO
+}
+
+void mmEffectCancel(mm_sfxhand handle)
+{
+	// TODO
+}
+
+void mmEffectRelease(mm_sfxhand handle)
+{
+	// TODO
+}
+
+void mmSetEffectsVolume(mm_word volume)
+{
+	_mmIssueCmd(mmPxiCmd_MasterEffectVol, volume, NULL, 0);
+}
+
+void mmEffectCancelAll()
+{
+	_mmIssueCmd(mmPxiCmd_EffectCancelAll, 0, NULL, 0);
 }

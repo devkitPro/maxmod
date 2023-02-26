@@ -163,8 +163,48 @@ MEOW_NOINLINE static void _mmProcessPxiCmd(mmPxiCmd cmd, unsigned imm, const voi
 			break;
 		}
 
+		case mmPxiCmd_Position: {
+			mmPosition(imm);
+			break;
+		}
+
+		case mmPxiCmd_StartSub: {
+			mmJingle(imm);
+			break;
+		}
+
+		case mmPxiCmd_MasterVol: {
+			mmSetModuleVolume(imm);
+			break;
+		}
+
+		case mmPxiCmd_MasterVolSub: {
+			mmSetJingleVolume(imm);
+			break;
+		}
+
+		case mmPxiCmd_MasterTempo: {
+			mmSetModuleTempo(imm);
+			break;
+		}
+
+		case mmPxiCmd_MasterPitch: {
+			mmSetModulePitch(imm);
+			break;
+		}
+
+		case mmPxiCmd_MasterEffectVol: {
+			mmSetEffectsVolume(imm);
+			break;
+		}
+
 		case mmPxiCmd_SelectMode: {
 			mmSelectMode((mm_mode_enum)imm);
+			break;
+		}
+
+		case mmPxiCmd_EffectCancelAll: {
+			mmEffectCancelAll();
 			break;
 		}
 	}

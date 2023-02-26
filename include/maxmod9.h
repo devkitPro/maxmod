@@ -395,7 +395,7 @@ void mmSetEffectsVolume( mm_word volume );
  * Stop all sound effects
  *****************************************************************/
  
-void mmEffectCancelAll();
+void mmEffectCancelAll( void );
 
 
 
