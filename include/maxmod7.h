@@ -73,6 +73,16 @@ void mmLockChannels( mm_word bitmask );
 void mmUnlockChannels( mm_word bitmask );
 
 /*****************************************************************
+ * mmSetEventHandler( mm_callback handler )
+ *
+ * Setup handler to receive playback events.
+ *
+ * handler : Pointer to your function.
+ *****************************************************************/
+
+void mmSetEventHandler( mm_callback handler );
+
+/*****************************************************************
  * mmIsInitialize()
  *
  * Returns whether or not the system is ready for playback.

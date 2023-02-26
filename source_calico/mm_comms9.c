@@ -3,6 +3,7 @@
 #include "mm_pxi.h"
 
 mm_ds_system s_mmState;
+static mm_callback s_mmCallback;
 
 MM_INLINE void _mmIssueCmd(mmPxiCmd cmd, unsigned imm, const void* arg, size_t arg_size)
 {
@@ -22,13 +23,47 @@ MM_INLINE void _mmIssueCmd(mmPxiCmd cmd, unsigned imm, const void* arg, size_t a
 #endif
 }
 
+#ifdef SYS_CALICO
+static void _mmPxiHandler(void* user, u32 msg)
+#else
+static void _mmPxiHandler(unsigned extra_words, void* user, u32 msg)
+#endif
+{
+	mmPxiEvent evt = mmPxiEventGetType(msg);
+	unsigned imm = mmPxiEventGetImm(msg);
+
+	switch (evt) {
+		default: break;
+
+		case mmPxiEvent_Credits: {
+			// TODO: Handle
+			break;
+		}
+
+		case mmPxiEvent_Status: {
+			// TODO: Handle
+			break;
+		}
+
+		case mmPxiEvent_SongMsg:
+		case mmPxiEvent_SongEnd: {
+			if (s_mmCallback) {
+				s_mmCallback(evt == mmPxiEvent_SongMsg ? MMCB_SONGMESSAGE : MMCB_SONGFINISHED, imm);
+			}
+			break;
+		}
+	}
+}
+
 void mmInit(const mm_ds_system* system)
 {
 	s_mmState = *system;
 
 #ifdef SYS_CALICO
+	pxiSetHandler(PxiChannel_Maxmod, _mmPxiHandler, NULL);
 	pxiWaitRemote(PxiChannel_Maxmod);
 #else
+	fifoSetMsgHandler(FIFO_MAXMOD, _mmPxiHandler, NULL);
 	fifoWaitRemote(FIFO_MAXMOD);
 #endif
 
@@ -67,7 +102,7 @@ void mmUnlockChannels(mm_word bitmask)
 
 void mmSetEventHandler(mm_callback handler)
 {
-	// TODO
+	s_mmCallback = handler;
 }
 
 void mmStart(mm_word module_ID, mm_pmode mode)

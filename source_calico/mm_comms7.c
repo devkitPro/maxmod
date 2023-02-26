@@ -52,6 +52,27 @@ static void _mmPxiHandler(void* user, u32 data)
 	}
 }
 
+MEOW_INLINE void _mmSendEvent(mmPxiEvent evt, unsigned imm)
+{
+	pxiSend(PxiChannel_Maxmod, mmPxiMakeEventMsg(evt, imm));
+}
+
+static mm_word _mmEventForwarder(mm_word msg, mm_word param)
+{
+	switch (msg) {
+		default: break;
+
+		case MMCB_SONGMESSAGE:
+			_mmSendEvent(mmPxiEvent_SongMsg, param);
+			break;
+
+		case MMCB_SONGFINISHED:
+			_mmSendEvent(mmPxiEvent_SongEnd, param);
+			break;
+	}
+	return 0;
+}
+
 static int _mmThreadMain(void* arg)
 {
 	// Set up timer IRQ
@@ -63,6 +84,9 @@ static int _mmThreadMain(void* arg)
 	mailboxPrepare(&s_mmMailbox, slots, MM_NUM_MAIL_SLOTS);
 	mailboxPrepare(&s_mmPxiMailbox, s_mmPxiMailboxSlots, MM_PXI_NUM_CREDITS);
 	pxiSetHandler(PxiChannel_Maxmod, _mmPxiHandler, &s_mmPxiMailbox);
+
+	// Set up maxmod event forwarder
+	mmSetEventHandler(_mmEventForwarder);
 
 	for (;;) {
 		// Get message
@@ -177,6 +201,6 @@ void _mmProcessComms(void)
 
 	if (credits) {
 		// Return credits to arm9
-		MEOW_DUMMY(credits);
+		_mmSendEvent(mmPxiEvent_Credits, credits);
 	}
 }

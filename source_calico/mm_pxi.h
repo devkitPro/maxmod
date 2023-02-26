@@ -39,6 +39,13 @@ typedef enum mmPxiCmd {
 	mmPxiCmd_EffectCancelAll = 29,
 } mmPxiCmd;
 
+typedef enum mmPxiEvent {
+	mmPxiEvent_Credits = 0,
+	mmPxiEvent_Status  = 1,
+	mmPxiEvent_SongMsg = 2,
+	mmPxiEvent_SongEnd = 3,
+} mmPxiEvent;
+
 typedef struct mmPxiArgBank {
 	u16 num_songs;
 	void* mm_bank;
@@ -73,4 +80,19 @@ MM_CONSTEXPR mmPxiCmd mmPxiCmdGetType(u32 msg)
 MM_CONSTEXPR unsigned mmPxiCmdGetImm(u32 msg)
 {
 	return msg >> 5;
+}
+
+MM_CONSTEXPR u32 mmPxiMakeEventMsg(mmPxiEvent evt, unsigned imm)
+{
+	return (evt & 3) | (imm << 2);
+}
+
+MM_CONSTEXPR mmPxiEvent mmPxiEventGetType(u32 msg)
+{
+	return (mmPxiCmd)(msg & 3);
+}
+
+MM_CONSTEXPR unsigned mmPxiEventGetImm(u32 msg)
+{
+	return msg >> 2;
 }
