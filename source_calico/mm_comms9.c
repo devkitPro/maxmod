@@ -18,22 +18,14 @@ MM_INLINE void _mmIssueCmd(mmPxiCmd cmd, unsigned imm, const void* arg, size_t a
 
 	// TODO: Check credits
 
-#ifdef SYS_CALICO
 	if (arg_size) {
 		pxiSendWithData(PxiChannel_Maxmod, msg, (const u32*)arg, arg_size_words);
 	} else {
 		pxiSend(PxiChannel_Maxmod, mmPxiMakeCmdMsg(cmd, imm));
 	}
-#else
-	fifoSendMsg(FIFO_MAXMOD, msg, arg_size_words, (const u32*)arg);
-#endif
 }
 
-#ifdef SYS_CALICO
 static void _mmPxiHandler(void* user, u32 msg)
-#else
-static void _mmPxiHandler(unsigned extra_words, void* user, u32 msg)
-#endif
 {
 	mmPxiEvent evt = mmPxiEventGetType(msg);
 	unsigned imm = mmPxiEventGetImm(msg);
@@ -69,13 +61,8 @@ void mmInit(const mm_ds_system* system)
 {
 	s_mmState = *system;
 
-#ifdef SYS_CALICO
 	pxiSetHandler(PxiChannel_Maxmod, _mmPxiHandler, NULL);
 	pxiWaitRemote(PxiChannel_Maxmod);
-#else
-	fifoSetMsgHandler(FIFO_MAXMOD, _mmPxiHandler, NULL);
-	fifoWaitRemote(FIFO_MAXMOD);
-#endif
 
 	mmPxiArgBank arg = {
 		.num_songs = system->mod_count,
@@ -189,22 +176,14 @@ MM_INLINE bool _mmValidateEffectHandle(mm_sfxhand handle)
 
 static mm_sfxhand _mmCreateEffectHandle(void)
 {
-#ifdef SYS_CALICO
 	IrqState st = irqLock();
-#else
-	int cS = enterCriticalSection();
-#endif
 
 	int id = __builtin_ffs((u16)~s_mmEffState.used_mask)-1;
 	if (id >= 0) {
 		s_mmEffState.used_mask |= 1U << id;
 	}
 
-#ifdef SYS_CALICO
 	irqUnlock(st);
-#else
-	leaveCriticalSection(cS);
-#endif
 
 	if (id < 0) {
 		return 0;

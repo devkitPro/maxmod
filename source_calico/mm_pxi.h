@@ -1,16 +1,9 @@
 #pragma once
 
-#ifdef SYS_CALICO
 #include <calico.h>
 #define MM_INLINE    MEOW_INLINE
 #define MM_CONSTEXPR MEOW_CONSTEXPR
 #define PxiChannel_Maxmod ((PxiChannel)22)
-#else
-#include <nds.h>
-#define MM_INLINE    static inline
-#define MM_CONSTEXPR static inline
-#define armDCacheFlush DC_FlushRange
-#endif
 
 #define MM_PXI_NUM_CREDITS 64
 

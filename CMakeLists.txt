@@ -10,22 +10,14 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 	set(CMAKE_INSTALL_PREFIX "${NDS_ROOT}" CACHE PATH "" FORCE)
 endif()
 
-if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "armv4t")
-	set(PLATFORM_SUFFIX "7")
-	set(ARM7 TRUE)
-elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "armv5te")
-	set(PLATFORM_SUFFIX "9")
-	set(ARM9 TRUE)
-else()
-	message(FATAL_ERROR "Invalid processor, must be armv4t or armv5te")
-endif()
-
-if("${DKP_NDS_PLATFORM_LIBRARY}" STREQUAL "calico")
-	set(CALICO TRUE)
-endif()
-
-if(ARM7 AND NOT CALICO)
-	message(FATAL_ERROR "NDS ARM7 must be built with calico")
+if(NINTENDO_DS)
+	if(ARM7)
+		set(PLATFORM_SUFFIX "7")
+	elseif(ARM9)
+		set(PLATFORM_SUFFIX "9")
+	else()
+		message(FATAL_ERROR "Invalid processor, must be armv4t or armv5te")
+	endif()
 endif()
 
 # Define static library target
@@ -38,10 +30,7 @@ target_compile_options(mm PRIVATE
 	-Wall -Werror
 )
 
-target_compile_definitions(mm PRIVATE SYS_NDS)
-if(CALICO)
-	target_compile_definitions(mm PRIVATE SYS_CALICO)
-endif()
+target_compile_definitions(mm PRIVATE SYS_NDS SYS_CALICO)
 
 # Add include directories
 target_include_directories(mm PRIVATE asm_include include)
