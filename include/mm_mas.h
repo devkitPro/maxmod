@@ -53,7 +53,7 @@ typedef struct tmm_mas_head
 	mm_byte		channel_panning[32];
 	mm_byte		sequence[200];
 
-	mm_addr		tables[];
+	mm_word		tables[];
 	// ::instrument table
 	// ::sample info table
 	// ::pattern table
