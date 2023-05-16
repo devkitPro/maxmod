@@ -64,6 +64,7 @@ if(ARM9)
 	target_sources(mm PRIVATE
 		source_calico/mm_comms9.c
 		source_calico/mm_loader.c
+		source_calico/mm_reverb.c
 	)
 
 	# Install the headers
