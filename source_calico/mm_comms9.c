@@ -25,6 +25,12 @@ MM_INLINE void _mmIssueCmd(mmPxiCmd cmd, unsigned imm, const void* arg, size_t a
 	}
 }
 
+MM_INLINE void _mmIssueCmdSync(mmPxiCmd cmd, unsigned imm)
+{
+	unsigned msg = mmPxiMakeCmdMsg(cmd, imm);
+	pxiSendAndReceive(PxiChannel_Maxmod, msg);
+}
+
 static void _mmPxiHandler(void* user, u32 msg)
 {
 	mmPxiEvent evt = mmPxiEventGetType(msg);
@@ -84,7 +90,7 @@ static void _mmLockUnlockChannels(mm_word bitmask, unsigned lock)
 		.lock = lock,
 	};
 
-	_mmIssueCmd(mmPxiCmd_SelChan, u.imm, NULL, 0);
+	_mmIssueCmdSync(mmPxiCmd_SelChan, u.imm);
 }
 
 void mmLockChannels(mm_word bitmask)

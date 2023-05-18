@@ -140,6 +140,7 @@ MEOW_NOINLINE static void _mmProcessPxiCmd(mmPxiCmd cmd, unsigned imm, const voi
 			} else {
 				mmUnlockChannels(u.mask);
 			}
+			pxiReply(PxiChannel_Maxmod, 0);
 			break;
 		}
 
