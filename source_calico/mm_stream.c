@@ -1,0 +1,246 @@
+#include <stdlib.h>
+#include <calico.h>
+#include <maxmod9.h>
+#include "mm_pxi.h"
+
+#define SOUND_CLOCKS_PER_TICK (64/2)
+
+typedef union mm_buf {
+	void* ptr;
+	u16*  ptr16;
+	u8*   ptr8;
+} mm_buf;
+
+static struct {
+	TickTask task;
+
+	mm_stream_func cb;
+
+	mm_buf buf;
+	mm_buf workbuf;
+
+	unsigned page_cnt;
+	unsigned page_len;
+	unsigned timer;
+
+	size_t right_offset;
+
+	unsigned write_pos;
+	unsigned read_pos;
+
+	u8 fmt_shift;
+	mm_stream_formats fmt;
+} s_mmStreamState;
+
+static void _mmStreamTickTask(TickTask* t)
+{
+	s_mmStreamState.page_cnt++;
+}
+
+void _mmDeinterleave8 (unsigned len, const u8* in,  u8* out,  unsigned right_offset);
+void _mmDeinterleave16(unsigned len, const u16* in, u16* out, unsigned right_offset);
+
+static unsigned _mmStreamRead(unsigned pos, unsigned len)
+{
+	mm_buf left_buf = { &s_mmStreamState.buf.ptr8[pos<<s_mmStreamState.fmt_shift] };
+	unsigned right_offset = s_mmStreamState.right_offset;
+	unsigned fmt_shift = s_mmStreamState.fmt_shift;
+
+	// Write to audio buf directly if mono, otherwise use workbuf for interleaved stereo
+	mm_buf cb_buf = left_buf;
+	if (right_offset) {
+		cb_buf = s_mmStreamState.workbuf;
+	}
+
+	// Generate audio data using user callback
+	unsigned ret = s_mmStreamState.cb(len, cb_buf.ptr, s_mmStreamState.fmt);
+	if (ret == 0 || ret > len) {
+		return 0;
+	}
+
+	if (right_offset) {
+		// Deinterleave the audio data into the final left/right buffers
+		if (fmt_shift) {
+			_mmDeinterleave16(ret, cb_buf.ptr16, left_buf.ptr16, right_offset);
+		} else {
+			_mmDeinterleave8 (ret, cb_buf.ptr8,  left_buf.ptr8,  right_offset);
+		}
+
+		mm_buf right_buf = { &left_buf.ptr8[right_offset] };
+		armDCacheFlush(right_buf.ptr, ret<<fmt_shift);
+	}
+
+	armDCacheFlush(left_buf.ptr, ret<<fmt_shift);
+
+	return ret;
+}
+
+static void _mmStreamRefill(void)
+{
+	unsigned total_len = s_mmStreamState.page_len*2;
+	unsigned rd_pos = s_mmStreamState.read_pos;
+	unsigned wr_pos = s_mmStreamState.write_pos;
+
+	do {
+		unsigned len;
+
+		if (rd_pos > wr_pos) {
+			len = _mmStreamRead(wr_pos, rd_pos-wr_pos);
+		} else {
+			len = _mmStreamRead(wr_pos, total_len-wr_pos);
+		}
+
+		if (!len) {
+			break;
+		}
+
+		wr_pos += len;
+		if (wr_pos == total_len) {
+			wr_pos = 0;
+		}
+
+	} while (wr_pos != rd_pos);
+
+	s_mmStreamState.write_pos = wr_pos;
+}
+
+void mmStreamOpen(const mm_stream* stream)
+{
+	if (s_mmStreamState.task.fn) {
+		mmStreamClose();
+	}
+
+	// Calculate page length (half buffer)
+	unsigned page_len = (stream->buffer_length + 1) / 2;
+	page_len = (page_len + SOUND_CLOCKS_PER_TICK - 1) &~ (SOUND_CLOCKS_PER_TICK - 1);
+
+	// Calculate timing constants
+	unsigned sound_timer = soundTimerFromHz(stream->sampling_rate);
+	unsigned task_period = (page_len/SOUND_CLOCKS_PER_TICK) * sound_timer;
+
+	// Other misc useful values
+	unsigned fmt_shift = stream->format >= MM_STREAM_16BIT_MONO;
+	unsigned chn_shift = stream->format & 1;
+
+	// Calculate total buffer size
+	unsigned buf_len_words = page_len >> (1-fmt_shift);      // only one channel
+	size_t buf_sz = page_len << (1 + fmt_shift + chn_shift); // if stereo: including both channels
+
+	// Allocate main audio buffer
+	s_mmStreamState.buf.ptr = aligned_alloc(ARM_CACHE_LINE_SZ, buf_sz);
+	if (!s_mmStreamState.buf.ptr) {
+		return;
+	}
+
+	// Allocate separate interleaved work buffer for stereo streams
+	if (chn_shift) {
+		s_mmStreamState.workbuf.ptr = malloc(buf_sz);
+		s_mmStreamState.right_offset = buf_sz/2;
+
+		if (!s_mmStreamState.workbuf.ptr) {
+			free(s_mmStreamState.buf.ptr);
+			return;
+		}
+	} else {
+		s_mmStreamState.workbuf.ptr = NULL;
+		s_mmStreamState.right_offset = 0;
+	}
+
+	// Initialize stream state struct
+	s_mmStreamState.cb = stream->callback;
+	s_mmStreamState.page_cnt = 0;
+	s_mmStreamState.page_len = page_len;
+	s_mmStreamState.timer = sound_timer;
+	s_mmStreamState.read_pos = 0;
+	s_mmStreamState.write_pos = 0;
+	s_mmStreamState.fmt_shift = fmt_shift;
+	s_mmStreamState.fmt = stream->format;
+
+	// Prefill audio buffers
+	_mmStreamRefill();
+
+	// Reserve channels from maxmod's ARM7 engine
+	u32 chn_mask = chn_shift ? 5 : 1;
+	mmLockChannels(chn_mask);
+
+	// Prepare (left) channel
+	SoundFmt sound_fmt = fmt_shift ? SoundFmt_Pcm16 : SoundFmt_Pcm8;
+	soundPreparePcm(0, 0x7f0, chn_shift ? 0 : 0x40, sound_timer, SoundMode_Repeat, sound_fmt,
+		s_mmStreamState.buf.ptr, 0, buf_len_words);
+
+	// Prepare right channel if needed
+	if (chn_shift) {
+		soundPreparePcm(2, 0x7f0, 0x7f, sound_timer, SoundMode_Repeat, sound_fmt,
+			&s_mmStreamState.buf.ptr8[s_mmStreamState.right_offset], 0, buf_len_words);
+	}
+
+	// Atomically start channel(s) and afterwards the stream tick task
+	ArmIrqState st = armIrqLockByPsr();
+	soundStart(chn_mask);
+	soundSynchronize();
+	tickTaskStart(&s_mmStreamState.task, _mmStreamTickTask, task_period, task_period);
+	armIrqUnlockByPsr(st);
+}
+
+static mm_word _mmStreamGetPosition(mm_word mask)
+{
+	// Atomically read current page + tick position
+	ArmIrqState st = armIrqLockByPsr();
+	unsigned cur_page = s_mmStreamState.page_cnt;
+	unsigned ticks = (unsigned)tickGetCount() - (s_mmStreamState.task.target - s_mmStreamState.task.period);
+	armIrqUnlockByPsr(st);
+
+	// XX: For safety's sake, account for not-yet-triggered page switch events
+	while (ticks >= s_mmStreamState.task.period) {
+		cur_page ++;
+		ticks -= s_mmStreamState.task.period;
+	}
+
+	// Combine page counter + fine grained sample counter
+	mm_word coarse = (cur_page & mask) * s_mmStreamState.page_len;
+	mm_word fine = ticks*SOUND_CLOCKS_PER_TICK/s_mmStreamState.timer;
+
+	return coarse + fine;
+}
+
+void mmStreamUpdate(void)
+{
+	if (!s_mmStreamState.task.fn) {
+		return;
+	}
+
+	s_mmStreamState.read_pos = _mmStreamGetPosition(1) &~ 3; // only allow 4-sample increments
+	_mmStreamRefill();
+}
+
+void mmStreamClose(void)
+{
+	if (!s_mmStreamState.task.fn) {
+		return;
+	}
+
+	// Stop counter tick task
+	tickTaskStop(&s_mmStreamState.task);
+
+	// Stop channels and return them to maxmod's ARM7 engine
+	u32 chn_mask = s_mmStreamState.right_offset ? 5 : 1;
+	soundStop(chn_mask);
+	soundSynchronize();
+	mmUnlockChannels(chn_mask);
+
+	// Free buffers
+	free(s_mmStreamState.workbuf.ptr);
+	free(s_mmStreamState.buf.ptr);
+
+	// Clear all state
+	armFillMem32(&s_mmStreamState, 0, sizeof(s_mmStreamState));
+}
+
+mm_word mmStreamGetPosition(void)
+{
+	if (!s_mmStreamState.task.fn) {
+		return 0;
+	}
+
+	return _mmStreamGetPosition(~0U);
+}

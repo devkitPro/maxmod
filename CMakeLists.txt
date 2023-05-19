@@ -65,6 +65,8 @@ if(ARM9)
 		source_calico/mm_comms9.c
 		source_calico/mm_loader.c
 		source_calico/mm_reverb.c
+		source_calico/mm_stream.c
+		source_calico/mm_deinterleave.32.s
 	)
 
 	# Install the headers
