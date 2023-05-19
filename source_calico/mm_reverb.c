@@ -34,7 +34,6 @@ void mmReverbEnable(void)
 	}
 
 	mmLockChannels((1U<<1) | (1U<<3));
-	soundInit();
 	s_mmReverbState = mm_reverb_stopped;
 	s_mmReverbDry = 3;
 }

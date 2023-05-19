@@ -67,6 +67,10 @@ void mmInit(const mm_ds_system* system)
 {
 	s_mmState = *system;
 
+	tickInit();
+	soundInit();
+	soundSetMixerSleep(false);
+
 	pxiSetHandler(PxiChannel_Maxmod, _mmPxiHandler, NULL);
 	pxiWaitRemote(PxiChannel_Maxmod);
 
