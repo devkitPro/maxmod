@@ -6,7 +6,7 @@ $(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>dev
 endif
 
 ifeq ($(SYSTEM),)
-$(error "Please specify SYSTEM, valid systems are: GBA, DS7, DS9" )
+$(error "Please specify SYSTEM, valid systems are: GBA" )
 endif
 
 ifeq ($(SYSTEM),GBA)
@@ -20,28 +20,8 @@ GOODSYSTEM	:= YES
 
 endif
 
-ifeq ($(SYSTEM),DS7)
-
-SOURCES		:=	source source_ds7 source_ds
-BUILD		:=	build_ds7
-TARGET		:=	$(TOPDIR)/lib/libmm7.a
-include $(DEVKITARM)/ds_rules
-GOODSYSTEM	:= YES
-
-endif
-
-ifeq ($(SYSTEM),DS9)
-
-SOURCES		:=	source_ds9 source_ds
-BUILD		:=	build_ds9
-TARGET		:=	$(TOPDIR)/lib/libmm9.a
-include $(DEVKITARM)/ds_rules
-GOODSYSTEM	:= YES
-
-endif
-
 ifneq ($(GOODSYSTEM),YES)
-$(error "Invalid SYSTEM, valid systems are: GBA, DS7, DS9" )
+$(error "Invalid SYSTEM, valid systems are: GBA" )
 endif
 
 INCLUDES	:=	asm_include
@@ -54,20 +34,6 @@ ifeq ($(SYSTEM),GBA)
 
 DEFS	:=	-DSYS_GBA -DUSE_IWRAM
 ARCH	:=	$(XMEM) -march=armv4t -mthumb -mthumb-interwork
-
-endif
-
-ifeq ($(SYSTEM),DS7)
-
-DEFS	:=	-DSYS_NDS -DSYS_NDS7
-ARCH	:=	-march=armv4t -mthumb -mthumb-interwork
-
-endif
-
-ifeq ($(SYSTEM),DS9)
-
-DEFS	:=	-DSYS_NDS -DSYS_NDS9
-ARCH	:=	-mthumb-interwork -march=armv5te -mtune=arm946e-s
 
 endif
 

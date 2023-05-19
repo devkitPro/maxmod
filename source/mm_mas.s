@@ -4788,7 +4788,7 @@ mpph_VolumeSlide:
 @                                          TABLES
 @==========================================================================================
 
-#ifndef SYS_CALICO
+#ifndef SYS_NDS
 .TEXT
 #else
 .section ".main.mmtables", "a"

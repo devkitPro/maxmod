@@ -109,11 +109,8 @@
 	
 	.equ	SOUNDxCNT_ENABLE,	0x80000000
 	
-#ifndef SYS_CALICO
-	.equ	TIMER,			0x4000100 @ Timer 0
-#else
 	.equ	TIMER,			0x4000104 @ Timer 1 (Timer 0 is reserved for the microphone)
-#endif
+	
 	.equ	TIMER_BIT,		0x08
 	
 	.equ	SWTIMER,		0x4000104

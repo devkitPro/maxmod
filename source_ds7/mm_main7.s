@@ -223,53 +223,6 @@ mmUnlockChannels:
 
 
 /******************************************************************************
- * mmSuspendIRQ_t
- *
- * Function to disable interrupts via the status register
- ******************************************************************************/
-						.global mmSuspendIRQ_t
-						.thumb_func
-mmSuspendIRQ_t:
-	ldr	r0,=1f
-	bx	r0
-
-.arm
-.align 2
-1:	mrs	r0, cpsr
-	and	r1, r0, #0x80
-	orr	r0, #0x80
-	msr	cpsr, r0
-	str	r1, previous_irq_state
-	bx	lr
-.thumb
-
-/******************************************************************************
- * mmRestoreIRQ_t
- *
- * Function to enable interrupts via the status register
- ******************************************************************************/
-						.global	mmRestoreIRQ_t
-						.thumb_func
-mmRestoreIRQ_t:
-	ldr	r0,=1f
-	bx	r0
-
-.arm
-.align 2
-1:	mrs	r0, cpsr
-	ldr	r1, previous_irq_state
-	bic	r0, #0x80
-	orr	r0, r1
-	msr	cpsr, r0
-	bx	lr
-
-.thumb
-
-previous_irq_state:
-	.space	4
-
-	.thumb_func
-/******************************************************************************
  * mmIsInitialized()
  *
  * Returns true if the system is ready for playback
@@ -290,15 +243,6 @@ mmIsInitialized:
 						.thumb_func
 mmInit7:
 	push	{lr}
-
-#ifndef SYS_CALICO
-	mov	r0, #0x08
-	ldr	r1,=mmFrame
-	bl	irqSet
-
-	mov	r0, #0x08
-	bl	irqEnable
-#endif
 
 	ldr	r0,=0x400			// set volumes
 	bl	mmSetModuleVolume		//
@@ -333,11 +277,6 @@ mmInit7:
 
 	bl	mmMixerInit			// setup mixer
 
-#ifndef SYS_CALICO
-	ldr	r0,=mmEventForwarder		// forward events
-	bl	mmSetEventHandler
-#endif
-
 	ldr	r0,=mmInitialized		// set initialized flag
 	mov	r1, #42				//
 	strb	r1, [r0]			//
@@ -345,45 +284,6 @@ mmInit7:
 .exit_r3:
 	pop	{r3}
 	bx	r3
-
-#ifndef SYS_CALICO
-
-/******************************************************************************
- * mmInstall( channel )
- *
- * Install ARM7 system
- ******************************************************************************/
-						.global mmInstall
-						.thumb_func
-mmInstall:
-	push	{lr}
-
-	ldr	r1,=mmInitialized		// not initialized until we get soundbank data
-	mov	r2, #0				//
-	strb	r2, [r1]			//
-
-	bl	mmSetupComms			// setup communication
-
-	b	.exit_r3
-
-/******************************************************************************
- * mmEventForwarder( msg, param )
- *
- * Forward event to arm9
- ******************************************************************************/
-						.thumb_func
-mmEventForwarder:
-
-	push	{lr}
-	lsl	r1, #8
-	orr	r0, r1
-	mov	r1, #1
-	lsl	r1, #20
-	orr	r0, r1
-	bl	mmARM9msg
-	pop	{pc}
-
-#endif
 
 /******************************************************************************
  * mmGetSoundBank( n_songs, bank )
@@ -405,43 +305,6 @@ mmGetSoundBank:
 //------------------------------------------------
 
 	b	mmInit7
-
-#ifndef SYS_CALICO
-
-/******************************************************************************
- * mmFrame()
- *
- * Routine function
- ******************************************************************************/
-						.global mmFrame
-						.thumb_func
-mmFrame:
-
-	push	{lr}
-
-	ldr	r0,=mmInitialized	// catch not-initialized
-	ldrb	r0, [r0]		//
-	cmp	r0, #42			//
-	bne	1f			//
-
-	bl	mmMixerPre		// <-- critical timing
-
-	ldr	r0,=0x4000208		// enable irq
-	mov	r1, #1			//
-	strh	r1, [r0]		//
-
-	bl	mmUpdateEffects		// update sound effects
-	bl	mmPulse			// update module playback
-	bl	mmMixerMix		// update audio
-
-
-	bl	mmSendUpdateToARM9
-
-1:	bl	mmProcessComms		// process communications
-
-	ret1
-
-#endif
 
 .pool
 

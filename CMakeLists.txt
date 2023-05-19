@@ -30,7 +30,7 @@ target_compile_options(mm PRIVATE
 	-Wall -Werror
 )
 
-target_compile_definitions(mm PRIVATE SYS_NDS SYS_CALICO)
+target_compile_definitions(mm PRIVATE SYS_NDS)
 
 # Add include directories
 target_include_directories(mm PRIVATE asm_include include)
