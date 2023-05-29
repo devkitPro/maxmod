@@ -84,3 +84,9 @@ install(
 	TARGETS mm
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
+
+# Install the license
+install(
+	FILES maxmod_license.txt
+	DESTINATION ${CMAKE_INSTALL_PREFIX}
+)
