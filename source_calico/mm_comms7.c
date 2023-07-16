@@ -16,7 +16,7 @@ static u32 s_mmPxiMailboxSlots[MM_PXI_NUM_CREDITS];
 extern u8 mmInitialized;
 extern u32 mm_sfx_clearmask;
 
-MEOW_CODE32 MEOW_NOINLINE static void _mmProcessComms(void);
+MK_CODE32 MK_NOINLINE static void _mmProcessComms(void);
 
 // Missing prototypes for "internal" maxmod functions
 void mmMixerPre(void);
@@ -25,7 +25,7 @@ void mmPulse(void);
 void mmMixerMix(void);
 void mmGetSoundBank(u16 num_songs, void* mm_bank);
 
-MEOW_CODE32 static void _mmTimerIsr(void)
+MK_CODE32 static void _mmTimerIsr(void)
 {
 	// Do nothing if maxmod is not initialized
 	if (mmInitialized != 42) {
@@ -53,7 +53,7 @@ static void _mmPxiHandler(void* user, u32 data)
 	}
 }
 
-MEOW_INLINE void _mmSendEvent(mmPxiEvent evt, unsigned imm)
+MK_INLINE void _mmSendEvent(mmPxiEvent evt, unsigned imm)
 {
 	pxiSend(PxiChannel_Maxmod, mmPxiMakeEventMsg(evt, imm));
 }
@@ -119,7 +119,7 @@ void mmInstall(int thread_prio)
 	threadStart(&s_mmThread);
 }
 
-MEOW_NOINLINE static void _mmProcessPxiCmd(mmPxiCmd cmd, unsigned imm, const void* body, unsigned num_words)
+MK_NOINLINE static void _mmProcessPxiCmd(mmPxiCmd cmd, unsigned imm, const void* body, unsigned num_words)
 {
 	switch (cmd) {
 		default: {

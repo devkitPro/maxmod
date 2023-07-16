@@ -1,8 +1,6 @@
 #pragma once
 
 #include <calico.h>
-#define MM_INLINE    MEOW_INLINE
-#define MM_CONSTEXPR MEOW_CONSTEXPR
 #define PxiChannel_Maxmod ((PxiChannel)22)
 
 #define MM_PXI_NUM_CREDITS 64
@@ -73,32 +71,32 @@ typedef union mmPxiImmEffectOpt {
 	};
 } mmPxiImmEffectOpt;
 
-MM_CONSTEXPR u32 mmPxiMakeCmdMsg(mmPxiCmd cmd, unsigned imm)
+MK_CONSTEXPR u32 mmPxiMakeCmdMsg(mmPxiCmd cmd, unsigned imm)
 {
 	return (cmd & 0x1f) | (imm << 5);
 }
 
-MM_CONSTEXPR mmPxiCmd mmPxiCmdGetType(u32 msg)
+MK_CONSTEXPR mmPxiCmd mmPxiCmdGetType(u32 msg)
 {
 	return (mmPxiCmd)(msg & 0x1f);
 }
 
-MM_CONSTEXPR unsigned mmPxiCmdGetImm(u32 msg)
+MK_CONSTEXPR unsigned mmPxiCmdGetImm(u32 msg)
 {
 	return msg >> 5;
 }
 
-MM_CONSTEXPR u32 mmPxiMakeEventMsg(mmPxiEvent evt, unsigned imm)
+MK_CONSTEXPR u32 mmPxiMakeEventMsg(mmPxiEvent evt, unsigned imm)
 {
 	return (evt & 3) | (imm << 2);
 }
 
-MM_CONSTEXPR mmPxiEvent mmPxiEventGetType(u32 msg)
+MK_CONSTEXPR mmPxiEvent mmPxiEventGetType(u32 msg)
 {
 	return (mmPxiCmd)(msg & 3);
 }
 
-MM_CONSTEXPR unsigned mmPxiEventGetImm(u32 msg)
+MK_CONSTEXPR unsigned mmPxiEventGetImm(u32 msg)
 {
 	return msg >> 2;
 }

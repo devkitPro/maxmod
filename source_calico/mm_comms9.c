@@ -11,7 +11,7 @@ static struct {
 	u8 instances[16];
 } s_mmEffState;
 
-MM_INLINE void _mmIssueCmd(mmPxiCmd cmd, unsigned imm, const void* arg, size_t arg_size)
+MK_INLINE void _mmIssueCmd(mmPxiCmd cmd, unsigned imm, const void* arg, size_t arg_size)
 {
 	unsigned arg_size_words = (arg_size + 3) / 4;
 	unsigned msg = mmPxiMakeCmdMsg(cmd, imm);
@@ -25,7 +25,7 @@ MM_INLINE void _mmIssueCmd(mmPxiCmd cmd, unsigned imm, const void* arg, size_t a
 	}
 }
 
-MM_INLINE void _mmIssueCmdSync(mmPxiCmd cmd, unsigned imm)
+MK_INLINE void _mmIssueCmdSync(mmPxiCmd cmd, unsigned imm)
 {
 	unsigned msg = mmPxiMakeCmdMsg(cmd, imm);
 	pxiSendAndReceive(PxiChannel_Maxmod, msg);
@@ -176,7 +176,7 @@ mm_bool mmActive(void)
 	return s_mmActiveStatus;
 }
 
-MM_INLINE bool _mmValidateEffectHandle(mm_sfxhand handle)
+MK_INLINE bool _mmValidateEffectHandle(mm_sfxhand handle)
 {
 	int id = (handle & 0xff) - 1;
 	int inst = handle >> 8;
