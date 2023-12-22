@@ -11,8 +11,13 @@ typedef union mm_buf {
 	u8*   ptr8;
 } mm_buf;
 
+static u32 s_mmStreamMailboxSlots[2];
+
 static struct {
 	TickTask task;
+
+	Thread* thread;
+	Mailbox mbox;
 
 	mm_stream_func cb;
 
@@ -35,6 +40,10 @@ static struct {
 static void _mmStreamTickTask(TickTask* t)
 {
 	s_mmStreamState.page_cnt++;
+
+	if (s_mmStreamState.mbox.pending_slots == 0) {
+		mailboxTrySend(&s_mmStreamState.mbox, 1);
+	}
 }
 
 void _mmDeinterleave8 (unsigned len, const u8* in,  u8* out,  unsigned right_offset);
@@ -104,9 +113,50 @@ static void _mmStreamRefill(void)
 	s_mmStreamState.write_pos = wr_pos;
 }
 
+MK_NOINLINE static void _mmStreamStart(u32 chn_mask, unsigned task_period)
+{
+	// Prefill audio buffers
+	_mmStreamRefill();
+
+	// Atomically start channel(s) and afterwards the stream tick task
+	ArmIrqState st = armIrqLockByPsr();
+	soundStart(chn_mask);
+	soundSynchronize();
+	tickTaskStart(&s_mmStreamState.task, _mmStreamTickTask, task_period, task_period);
+	armIrqUnlockByPsr(st);
+}
+
+MK_NOINLINE static void _mmStreamStop(u32 chn_mask)
+{
+	// Stop counter tick task
+	tickTaskStop(&s_mmStreamState.task);
+
+	// Stop channels and return them to maxmod's ARM7 engine
+	soundStop(chn_mask);
+	soundSynchronize();
+	mmUnlockChannels(chn_mask);
+}
+
+static int _mmStreamThread(void* arg)
+{
+	u32 chn_mask = s_mmStreamState.right_offset ? 5 : 1;
+	unsigned task_period = (unsigned)arg;
+
+	_mmStreamStart(chn_mask, task_period);
+
+	while (mailboxRecv(&s_mmStreamState.mbox) != 0) {
+		mmStreamUpdate();
+	}
+
+	_mmStreamStop(chn_mask);
+
+	return 0;
+}
+
 void mmStreamOpen(const mm_stream* stream)
 {
-	if (s_mmStreamState.task.fn) {
+	// Close stream if already open
+	if (s_mmStreamState.task.fn || s_mmStreamState.thread) {
 		mmStreamClose();
 	}
 
@@ -146,7 +196,29 @@ void mmStreamOpen(const mm_stream* stream)
 		s_mmStreamState.right_offset = 0;
 	}
 
+	// Allocate and prepare stream thread if needed
+	if (stream->minus_thread_prio <= 0) {
+		// Calculate needed size for thread
+		size_t thread_sz = stream->thread_stack_size ? stream->thread_stack_size : 8*1024;
+		thread_sz = (sizeof(Thread) + threadGetLocalStorageSize() + thread_sz + 7) &~ 7;
+
+		// Allocate thread memory
+		s_mmStreamState.thread = malloc(thread_sz);
+		if (!s_mmStreamState.thread) {
+			free(s_mmStreamState.workbuf.ptr);
+			free(s_mmStreamState.buf.ptr);
+			return;
+		}
+
+		// Prepare thread
+		threadPrepare(s_mmStreamState.thread, _mmStreamThread, (void*)task_period,
+			(u8*)s_mmStreamState.thread + thread_sz,
+			stream->minus_thread_prio < 0 ? (-stream->minus_thread_prio) : (MAIN_THREAD_PRIO+1));
+		threadAttachLocalStorage(s_mmStreamState.thread, NULL);
+	}
+
 	// Initialize stream state struct
+	mailboxPrepare(&s_mmStreamState.mbox, s_mmStreamMailboxSlots, 2);
 	s_mmStreamState.cb = stream->callback;
 	s_mmStreamState.page_cnt = 0;
 	s_mmStreamState.page_len = page_len;
@@ -155,9 +227,6 @@ void mmStreamOpen(const mm_stream* stream)
 	s_mmStreamState.write_pos = 0;
 	s_mmStreamState.fmt_shift = fmt_shift;
 	s_mmStreamState.fmt = stream->format;
-
-	// Prefill audio buffers
-	_mmStreamRefill();
 
 	// Reserve channels from maxmod's ARM7 engine
 	u32 chn_mask = chn_shift ? 5 : 1;
@@ -174,12 +243,13 @@ void mmStreamOpen(const mm_stream* stream)
 			&s_mmStreamState.buf.ptr8[s_mmStreamState.right_offset], 0, buf_len_words);
 	}
 
-	// Atomically start channel(s) and afterwards the stream tick task
-	ArmIrqState st = armIrqLockByPsr();
-	soundStart(chn_mask);
-	soundSynchronize();
-	tickTaskStart(&s_mmStreamState.task, _mmStreamTickTask, task_period, task_period);
-	armIrqUnlockByPsr(st);
+	if (stream->minus_thread_prio > 0) {
+		// Start the stream directly
+		_mmStreamStart(chn_mask, task_period);
+	} else {
+		// Start the stream thread
+		threadStart(s_mmStreamState.thread);
+	}
 }
 
 static mm_word _mmStreamGetPosition(mm_word mask)
@@ -209,24 +279,31 @@ void mmStreamUpdate(void)
 		return;
 	}
 
+	if (s_mmStreamState.thread && threadGetSelf() != s_mmStreamState.thread) {
+		return;
+	}
+
 	s_mmStreamState.read_pos = _mmStreamGetPosition(1) &~ 3; // only allow 4-sample increments
 	_mmStreamRefill();
 }
 
 void mmStreamClose(void)
 {
-	if (!s_mmStreamState.task.fn) {
+	// Check for and stop the stream thread
+	if (s_mmStreamState.thread) {
+		mailboxTrySend(&s_mmStreamState.mbox, 0);
+		threadJoin(s_mmStreamState.thread);
+		free(s_mmStreamState.thread);
+	}
+	// Otherwise: check for and stop manually started streams
+	else if (s_mmStreamState.task.fn) {
+		u32 chn_mask = s_mmStreamState.right_offset ? 5 : 1;
+		_mmStreamStop(chn_mask);
+	}
+	// Otherwise: no stream is active
+	else {
 		return;
 	}
-
-	// Stop counter tick task
-	tickTaskStop(&s_mmStreamState.task);
-
-	// Stop channels and return them to maxmod's ARM7 engine
-	u32 chn_mask = s_mmStreamState.right_offset ? 5 : 1;
-	soundStop(chn_mask);
-	soundSynchronize();
-	mmUnlockChannels(chn_mask);
 
 	// Free buffers
 	free(s_mmStreamState.workbuf.ptr);

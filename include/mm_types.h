@@ -100,7 +100,6 @@ typedef enum
 } mm_reverbch;
 //-----------------------------------------------------------------------------
 
-
 typedef struct mmreverbcfg
 {
 	mm_word				flags;
@@ -133,17 +132,6 @@ typedef enum
 	MM_MIX_31KHZ
 //-----------------------------------------------------------------------------
 } mm_mixmode;
-//-----------------------------------------------------------------------------
-
-typedef enum
-{
-	MM_TIMER0,	// hardware timer 0
-	MM_TIMER1,	// hardware timer 1
-	MM_TIMER2,	// hardware timer 2
-	MM_TIMER3	// hardware timer 3
-
-//-----------------------------------------------------------------------------
-} mm_stream_timer;
 //-----------------------------------------------------------------------------
 
 typedef struct t_mmdssample
@@ -222,6 +210,12 @@ typedef struct t_mmdssystem
 } mm_ds_system;
 //-----------------------------------------------------------------------------
 
+// Compatibility
+#define MM_TIMER0 0
+#define MM_TIMER1 0
+#define MM_TIMER2 0
+#define MM_TIMER3 0
+
 typedef struct t_mmstream
 {	
 // sampling rate. 1024->32768 (HZ)
@@ -235,13 +229,22 @@ typedef struct t_mmstream
 
 // stream format (mm_stream_formats)
 	mm_word format;
-	
-// hardware timer selection (mm_stream_timers)
-	mm_word timer;
 
-// if set, user must call mmStreamUpdate manually
-	mm_bool manual;
-	
+// thread stack size (0 = default)
+union {
+	mm_word thread_stack_size;
+	mm_word timer; // for compatibility
+};
+
+// if positive, no thread is created and user must call mmStreamUpdate manually
+// if zero or negative, maxmod creates a thread that calls it automatically
+//   if zero: thread priority is default
+//   if negative: thread priority is user-specified (absolute value)
+union {
+	mm_bool manual; // for compatibility
+	int8_t minus_thread_prio;
+};
+
 //-----------------------------------------------------------------------------
 } mm_stream;
 //-----------------------------------------------------------------------------
