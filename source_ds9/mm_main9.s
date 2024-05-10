@@ -198,9 +198,10 @@ mmInitDefault:
 	push	{r0, r1, r2, r3}		// push onto stack, r2 = trash/spacer
 	
 	add	r0, r1				// allocate memory ((mod+samp)*4) for the memory bank
-	lsl	r0, #2				// 
-	ldr	r1,=malloc			//
-	blx	r1				//
+	lsl	r0, #2				//
+	mov	r1, #1				//
+	ldr	r2,=calloc			//
+	blx	r2				//
 	str	r0, [sp, #MMDS9S_MEM_BANK]	//
 	
 	mov	r0, sp				// pass struct to mmInit
@@ -237,7 +238,8 @@ mmInitDefaultMem:
 	
 	add	r0, r1, r2			// allocate memory for memory bank
 	lsl	r0, #2				// size = (nsamples+nmodules) * 4
-	ldr	r3,=malloc			//
+	mov	r1, #1				//
+	ldr	r3,=calloc			//
 	blx	r3				//
 	str	r0, [sp, #MMDS9S_MEM_BANK+4]	//
 

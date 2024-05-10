@@ -227,8 +227,9 @@ mmLoadDataFromSoundBank:
 	
 	ldr	r0, [sp]			// r0 = file size (dont pop yet)
 	add	r0, #8				// r0 += file prefix size
-	ldr	r1,=malloc			// allocate memory
-	blx	r1				//
+	mov	r1, #1				//
+	ldr	r2,=calloc			// allocate memory
+	blx	r2				//
 	pop	{r1}				// r1 = file size (pop now)
 	add	r1, #8				//
 	push	{r0}				// push memory pointer

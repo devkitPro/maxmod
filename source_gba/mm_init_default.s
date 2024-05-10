@@ -68,6 +68,7 @@ mmInitDefault:
 	mul	r0, r6
 	ldr	r4,=mixlen
 	add	r0, r4
+	mov	r1, #1
 	bl	calloc
 
 	mov	r7, r0				// wavemem = beginning of buffer
