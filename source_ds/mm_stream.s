@@ -104,7 +104,7 @@ mmsData:		.space v_size
 
 /***********************************************************************
  * mmStreamOpen( stream )
- * mmStreamOpen( stream, wave, mem ) <- ARM7 cannot use calloc
+ * mmStreamOpen( stream, wave, mem ) <- ARM7 cannot use malloc
  *
  * Open audio stream.
  ***********************************************************************/
@@ -186,14 +186,12 @@ mmStreamOpen:
 	lsr	r1, r0, #2			//-- save real length (words)
 	strh	r1, [r6, #v_lenw]		//--
 	
-	#ifdef SYS_NDS9				// ARM9: use calloc
+	#ifdef SYS_NDS9				// ARM9: use malloc
 	push	{r0}				// alloc mem for wavebuffer
-	mov	r1, #1				//
-	bl	calloc				//
+	bl	malloc				//
 	str	r0, [r6, #v_wave]		//
 	pop	{r0}				// alloc mem for workbuffer
-	mov	r1, #1				//
-	bl	calloc				//
+	bl	malloc				//
 	str	r0, [r6, #v_workmem]		//
 	#endif					//
 	
@@ -848,7 +846,7 @@ mmStreamClose:
 	ldr	r2,=WaitForMemorySignal		//
 	blx	r2
 	
-	ldr	r0, [r4, #v_workmem]		// free calloc'd memory
+	ldr	r0, [r4, #v_workmem]		// free malloc'd memory
 	bl	free				//
 	ldr	r0, [r4, #v_wave]		//
 	bl	free				//
