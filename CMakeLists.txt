@@ -7,7 +7,11 @@ project(maxmod
 include(GNUInstallDirs)
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-	set(CMAKE_INSTALL_PREFIX "${NDS_ROOT}" CACHE PATH "" FORCE)
+	if(NINTENDO_DS)
+		set(CMAKE_INSTALL_PREFIX "${NDS_ROOT}" CACHE PATH "" FORCE)
+	elseif(NINTENDO_GBA)
+		set(CMAKE_INSTALL_PREFIX "${GBA_ROOT}" CACHE PATH "" FORCE)
+	endif()
 endif()
 
 if(NINTENDO_DS)
@@ -30,19 +34,34 @@ target_compile_options(mm PRIVATE
 	-Wall -Werror
 )
 
-target_compile_definitions(mm PRIVATE SYS_NDS)
-
 # Add include directories
 target_include_directories(mm PRIVATE asm_include include)
 
-if(ARM7)
+if(NINTENDO_GBA)
+	target_compile_definitions(mm PRIVATE SYS_GBA)
+	target_sources(mm PRIVATE
+		source_gba/mm_init_default.s
+		source_gba/mm_main_gba.s
+		source_gba/mm_mixer_gba.s
+	)
+
+	# Install the headers
+	install(
+		DIRECTORY ${PROJECT_SOURCE_DIR}/include/
+		DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+		FILES_MATCHING
+			PATTERN maxmod.h
+			PATTERN mm_types.h
+	)
+endif()
+
+if(NINTENDO_DS)
+	target_compile_definitions(mm PRIVATE SYS_NDS)
+endif()
+
+if(NINTENDO_DS AND ARM7)
 	target_compile_definitions(mm PRIVATE SYS_NDS7)
 	target_sources(mm PRIVATE
-		source/mm_main.s
-		source/mm_effect.s
-		source/mm_mas.s
-		source/mm_mas_arm.s
-
 		source_ds7/mm_main7.s
 		source_ds7/mm_mixer_super.s
 
@@ -59,7 +78,7 @@ if(ARM7)
 	)
 endif()
 
-if(ARM9)
+if(NINTENDO_DS AND ARM9)
 	target_compile_definitions(mm PRIVATE SYS_NDS9)
 	target_sources(mm PRIVATE
 		source_calico/mm_comms9.c
@@ -76,6 +95,15 @@ if(ARM9)
 		FILES_MATCHING
 			PATTERN maxmod9.h
 			PATTERN mm_types.h
+	)
+endif()
+
+if(ARM7)
+	target_sources(mm PRIVATE
+		source/mm_main.s
+		source/mm_effect.s
+		source/mm_mas.s
+		source/mm_mas_arm.s
 	)
 endif()
 

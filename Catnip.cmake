@@ -1,5 +1,11 @@
 
-catnip_package(maxmod DEFAULT all)
+catnip_package(maxmod DEFAULT ds7 ds9)
+
+catnip_add_preset(gba
+	TOOLSET    GBA
+	PROCESSOR  armv4t
+	BUILD_TYPE MinSizeRel
+)
 
 catnip_add_preset(ds7
 	TOOLSET    NDS
