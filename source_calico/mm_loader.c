@@ -92,7 +92,7 @@ void mmSetCustomSoundBankHandler(mm_callback p_loader)
 
 static void _mmLoadSample(mm_word sample_ID)
 {
-	mm_word* bank = (mm_word*)s_mmState.mem_bank + s_mmFile.hdr.moduleCount;
+	mm_word* bank = (mm_word*)s_mmState.mem_bank + s_mmState.mod_count;
 
 	if (bank[sample_ID] >= MM_SAMP_REF) {
 		bank[sample_ID] += MM_SAMP_REF; // addref
@@ -110,7 +110,7 @@ static void _mmLoadSample(mm_word sample_ID)
 
 static void _mmUnloadSample(mm_word sample_ID)
 {
-	mm_word* bank = (mm_word*)s_mmState.mem_bank + s_mmFile.hdr.moduleCount;
+	mm_word* bank = (mm_word*)s_mmState.mem_bank + s_mmState.mod_count;
 
 	mm_word entry = bank[sample_ID];
 	if (entry < MM_SAMP_REF) {
@@ -128,7 +128,7 @@ static void _mmUnloadSample(mm_word sample_ID)
 
 static void _mmFlushBank(void)
 {
-	armDCacheFlush(s_mmState.mem_bank, sizeof(void*) * (s_mmFile.hdr.moduleCount + s_mmFile.hdr.sampleCount));
+	armDCacheFlush(s_mmState.mem_bank, sizeof(void*) * (s_mmState.mod_count + s_mmState.samp_count));
 }
 
 void mmLoad(mm_word module_ID)
@@ -219,7 +219,7 @@ mm_word _mmFileLoadCallback(mm_word msg, mm_word param)
 			return 0;
 
 		case MMCB_SONGREQUEST:
-			param += s_mmFile.hdr.sampleCount;
+			param += s_mmState.samp_count;
 			// fallthrough
 
 		case MMCB_SAMPREQUEST: {
